@@ -1,0 +1,147 @@
+@model Smart_Campus_Service_Portal.Models.ViewModels.ServiceRequestSubmitViewModel
+@{
+    var service = ViewBag.Service as Smart_Campus_Service_Portal.Models.CampusService;
+    ViewBag.Title = $"Apply for {service?.Name ?? "Service"}";
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <a href="@Url.Action("Services", "Student")" class="small text-muted text-decoration-none mb-1 d-inline-block">
+            &larr; Back to Services Catalog
+        </a>
+        <h2>Apply for @service.Name</h2>
+        <p>@service.Description</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card-panel">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-file-pen"></i> Service Request Application Form
+                </h5>
+            </div>
+            <div class="card-panel-body">
+                @using (Html.BeginForm("ApplyService", "Student", FormMethod.Post, new { role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.ServiceId)
+
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger small mb-3" })
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-secondary">Request Priority Level *</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.Priority, "Low", new { @class = "form-check-input", id = "pLow" })
+                                <label class="form-check-label small" for="pLow">Low</label>
+                            </div>
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.Priority, "Medium", new { @class = "form-check-input", id = "pMedium", @checked = "checked" })
+                                <label class="form-check-label small" for="pMedium">Medium (Standard)</label>
+                            </div>
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.Priority, "High", new { @class = "form-check-input", id = "pHigh" })
+                                <label class="form-check-label small" for="pHigh">High</label>
+                            </div>
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.Priority, "Urgent", new { @class = "form-check-input", id = "pUrgent" })
+                                <label class="form-check-label small text-danger fw-bold" for="pUrgent">Urgent</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-list-check me-2"></i> Service Specific Details</h6>
+
+                    <div class="row g-3 mb-4">
+                        @foreach (var field in service.FormFields)
+                        {
+                            <div class="col-12">
+                                <label class="form-label fw-bold small text-secondary">
+                                    @field.Label @(field.IsRequired ? "*" : "(Optional)")
+                                </label>
+
+                                @if (field.FieldType == "textarea")
+                                {
+                                    <textarea name="@field.Name" class="form-control" rows="3" placeholder="@field.Placeholder" @(field.IsRequired ? "required" : "")></textarea>
+                                }
+                                else if (field.FieldType == "select")
+                                {
+                                    <select name="@field.Name" class="form-select" @(field.IsRequired ? "required" : "")>
+                                        <option value="">-- Select @field.Label --</option>
+                                        @foreach (var opt in field.Options)
+                                        {
+                                            <option value="@opt">@opt</option>
+                                        }
+                                    </select>
+                                }
+                                else if (field.FieldType == "date")
+                                {
+                                    <input type="date" name="@field.Name" class="form-control" @(field.IsRequired ? "required" : "") />
+                                }
+                                else if (field.FieldType == "number")
+                                {
+                                    <input type="number" name="@field.Name" class="form-control" placeholder="@field.Placeholder" @(field.IsRequired ? "required" : "") />
+                                }
+                                else
+                                {
+                                    <input type="text" name="@field.Name" class="form-control" placeholder="@field.Placeholder" @(field.IsRequired ? "required" : "") />
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <a href="@Url.Action("Services", "Student")" class="btn btn-outline-secondary btn-sm fw-semibold">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">
+                            <i class="fa-solid fa-paper-plane me-2"></i> Submit Service Application
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Service SLA Info Card -->
+    <div class="col-lg-4">
+        <div class="card-panel">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-circle-info"></i> Service Information
+                </h5>
+            </div>
+            <div class="card-panel-body">
+                <div class="text-center py-3">
+                    <div class="stat-icon blue mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.6rem;">
+                        <i class="fa-solid @service.Icon"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1">@service.Name</h5>
+                    <span class="badge bg-light text-primary border fw-semibold">@service.Category</span>
+                </div>
+
+                <hr>
+
+                <div class="mb-3 small">
+                    <strong class="text-secondary">Service Code:</strong>
+                    <span class="float-end font-monospace fw-bold">@service.ServiceCode</span>
+                </div>
+                <div class="mb-3 small">
+                    <strong class="text-secondary">Department:</strong>
+                    <span class="float-end text-end fw-semibold">@service.Department</span>
+                </div>
+                <div class="mb-3 small">
+                    <strong class="text-secondary">Expected Turnaround:</strong>
+                    <span class="float-end text-success fw-bold">~@service.EstimatedDays Business Days</span>
+                </div>
+
+                <div class="alert alert-info small mb-0 mt-4">
+                    <i class="fa-solid fa-bell me-1"></i>
+                    Once submitted, you will receive a tracking ID (e.g. <code>REQ-2026-XXXX</code>) and status updates via email and the portal.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

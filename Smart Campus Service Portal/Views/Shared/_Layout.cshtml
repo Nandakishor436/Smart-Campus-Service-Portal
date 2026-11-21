@@ -1,0 +1,379 @@
+﻿@using Smart_Campus_Service_Portal.Helpers
+@{
+    bool isAuth = AuthSessionHelper.IsAuthenticated;
+    string currentRole = AuthSessionHelper.CurrentUserRole;
+    string currentName = AuthSessionHelper.CurrentUserFullName;
+    string currentEmail = AuthSessionHelper.CurrentUserEmail;
+    string currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    string currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@(ViewBag.Title ?? "Dashboard") - Smart Campus Service Portal</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Custom SaaS CSS -->
+    <link href="~/Content/Site.css" rel="stylesheet" />
+    
+    @RenderSection("styles", required: false)
+</head>
+<body>
+    @if (isAuth)
+    {
+        <div class="app-wrapper">
+            <!-- Sidebar Navigation -->
+            <aside class="app-sidebar" id="appSidebar">
+                <div class="sidebar-header">
+                    <div class="brand-icon">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div class="brand-text">
+                        <h5>SmartCampus</h5>
+                        <small>Service Portal</small>
+                    </div>
+                </div>
+
+                <div class="sidebar-nav">
+                    @if (currentRole == "Student")
+                    {
+                        <div class="nav-section-title">Main</div>
+                        <a href="@Url.Action("Index", "Student")" class="sidebar-link @(currentController == "Student" && currentAction == "Index" ? "active" : "")">
+                            <i class="fa-solid fa-gauge-high"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="@Url.Action("Services", "Student")" class="sidebar-link @(currentController == "Student" && currentAction == "Services" ? "active" : "")">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span>Campus Services</span>
+                        </a>
+                        <a href="@Url.Action("MyRequests", "Student")" class="sidebar-link @(currentController == "Student" && (currentAction == "MyRequests" || currentAction == "RequestDetails") ? "active" : "")">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                            <span>My Requests</span>
+                        </a>
+
+                        <div class="nav-section-title">Support & Feedback</div>
+                        <a href="@Url.Action("Complaints", "Student")" class="sidebar-link @(currentController == "Student" && currentAction == "Complaints" ? "active" : "")">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <span>Complaints Center</span>
+                        </a>
+                        <a href="@Url.Action("Feedback", "Student")" class="sidebar-link @(currentController == "Student" && currentAction == "Feedback" ? "active" : "")">
+                            <i class="fa-solid fa-star"></i>
+                            <span>Service Feedback</span>
+                        </a>
+                        <a href="@Url.Action("Announcements", "Student")" class="sidebar-link @(currentController == "Student" && currentAction == "Announcements" ? "active" : "")">
+                            <i class="fa-solid fa-bullhorn"></i>
+                            <span>Announcements</span>
+                        </a>
+                        <a href="@Url.Action("Notifications", "Student")" class="sidebar-link @(currentController == "Student" && currentAction == "Notifications" ? "active" : "")">
+                            <i class="fa-solid fa-bell"></i>
+                            <span>Notifications</span>
+                        </a>
+                    }
+                    else if (currentRole == "Faculty")
+                    {
+                        <div class="nav-section-title">Faculty Portal</div>
+                        <a href="@Url.Action("Index", "Faculty")" class="sidebar-link @(currentController == "Faculty" && currentAction == "Index" ? "active" : "")">
+                            <i class="fa-solid fa-chart-line"></i>
+                            <span>Faculty Dashboard</span>
+                        </a>
+                        <a href="@Url.Action("AssignedRequests", "Faculty")" class="sidebar-link @(currentController == "Faculty" && (currentAction == "AssignedRequests" || currentAction == "RequestDetails") ? "active" : "")">
+                            <i class="fa-solid fa-inbox"></i>
+                            <span>Assigned Requests</span>
+                        </a>
+                        <a href="@Url.Action("Complaints", "Faculty")" class="sidebar-link @(currentController == "Faculty" && currentAction == "Complaints" ? "active" : "")">
+                            <i class="fa-solid fa-comment-dots"></i>
+                            <span>Student Complaints</span>
+                        </a>
+
+                        <div class="nav-section-title">Department</div>
+                        <a href="@Url.Action("Services", "Faculty")" class="sidebar-link @(currentController == "Faculty" && currentAction == "Services" ? "active" : "")">
+                            <i class="fa-solid fa-cubes"></i>
+                            <span>Department Services</span>
+                        </a>
+                        <a href="@Url.Action("Feedback", "Faculty")" class="sidebar-link @(currentController == "Faculty" && currentAction == "Feedback" ? "active" : "")">
+                            <i class="fa-solid fa-star-half-stroke"></i>
+                            <span>Student Feedback</span>
+                        </a>
+                    }
+                    else if (currentRole == "Admin")
+                    {
+                        <div class="nav-section-title">Administration</div>
+                        <a href="@Url.Action("Index", "Admin")" class="sidebar-link @(currentController == "Admin" && currentAction == "Index" ? "active" : "")">
+                            <i class="fa-solid fa-chart-pie"></i>
+                            <span>Executive Dashboard</span>
+                        </a>
+                        <a href="@Url.Action("Requests", "Admin")" class="sidebar-link @(currentController == "Admin" && currentAction == "Requests" ? "active" : "")">
+                            <i class="fa-solid fa-list-check"></i>
+                            <span>All Requests</span>
+                        </a>
+                        <a href="@Url.Action("Services", "Admin")" class="sidebar-link @(currentController == "Admin" && currentAction == "Services" ? "active" : "")">
+                            <i class="fa-solid fa-sliders"></i>
+                            <span>Manage Services</span>
+                        </a>
+                        <a href="@Url.Action("Complaints", "Admin")" class="sidebar-link @(currentController == "Admin" && currentAction == "Complaints" ? "active" : "")">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span>Complaint Center</span>
+                        </a>
+
+                        <div class="nav-section-title">User Management</div>
+                        <a href="@Url.Action("Users", "Admin")" class="sidebar-link @(currentController == "Admin" && currentAction == "Users" ? "active" : "")">
+                            <i class="fa-solid fa-users-gear"></i>
+                            <span>All Users</span>
+                        </a>
+                        <a href="@Url.Action("Students", "Admin")" class="sidebar-link @(currentController == "Admin" && currentAction == "Students" ? "active" : "")">
+                            <i class="fa-solid fa-user-graduate"></i>
+                            <span>Student Directory</span>
+                        </a>
+                        <a href="@Url.Action("Faculty", "Admin")" class="sidebar-link @(currentController == "Admin" && currentAction == "Faculty" ? "active" : "")">
+                            <i class="fa-solid fa-chalkboard-user"></i>
+                            <span>Faculty Directory</span>
+                        </a>
+
+                        <div class="nav-section-title">Communication & Reports</div>
+                        <a href="@Url.Action("Announcements", "Admin")" class="sidebar-link @(currentController == "Admin" && currentAction == "Announcements" ? "active" : "")">
+                            <i class="fa-solid fa-bullhorn"></i>
+                            <span>Announcements</span>
+                        </a>
+                        <a href="@Url.Action("Feedback", "Admin")" class="sidebar-link @(currentController == "Admin" && currentAction == "Feedback" ? "active" : "")">
+                            <i class="fa-solid fa-comments"></i>
+                            <span>Feedback Analytics</span>
+                        </a>
+                        <a href="@Url.Action("Reports", "Admin")" class="sidebar-link @(currentController == "Admin" && currentAction == "Reports" ? "active" : "")">
+                            <i class="fa-solid fa-file-waveform"></i>
+                            <span>Reports & Analytics</span>
+                        </a>
+                    }
+
+                    <div class="nav-section-title">Account</div>
+                    <a href="@Url.Action("Profile", "Account")" class="sidebar-link @(currentController == "Account" && currentAction == "Profile" ? "active" : "")">
+                        <i class="fa-solid fa-id-badge"></i>
+                        <span>My Profile</span>
+                    </a>
+                    <a href="@Url.Action("ChangePassword", "Account")" class="sidebar-link @(currentController == "Account" && currentAction == "ChangePassword" ? "active" : "")">
+                        <i class="fa-solid fa-key"></i>
+                        <span>Change Password</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-footer">
+                    <div class="user-profile-badge">
+                        <div class="user-avatar">
+                            @(currentName.Length > 0 ? currentName.Substring(0, 1).ToUpper() : "U")
+                        </div>
+                        <div class="user-info-text">
+                            <div class="user-name">@currentName</div>
+                            <span class="user-role-pill role-@(currentRole?.ToLower())">@currentRole</span>
+                        </div>
+                        <a href="@Url.Action("Logout", "Account")" title="Log Out" class="text-secondary" style="font-size: 1.1rem;">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </a>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <div class="app-main">
+                <!-- Topbar -->
+                <header class="app-topbar">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-outline-secondary d-lg-none" id="sidebarToggleBtn" type="button">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <div class="topbar-search d-none d-md-block">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" placeholder="Search services, requests, notices..." id="globalSearchInput" />
+                        </div>
+                    </div>
+
+                    <div class="topbar-actions">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-sm btn-outline-primary" target="_blank" title="View Public Portal">
+                            <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Public Site
+                        </a>
+
+                        <div class="dropdown">
+                            <button class="topbar-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+                                <i class="fa-regular fa-bell"></i>
+                                <span class="topbar-badge" id="notificationBadge">1</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow" style="width: 320px; max-height: 400px; overflow-y: auto;">
+                                <li class="dropdown-header d-flex justify-content-between align-items-center fw-bold py-2">
+                                    <span>Notifications</span>
+                                    <small class="text-primary cursor-pointer" onclick="markAllNotificationsRead()">Mark all read</small>
+                                </li>
+                                <li><hr class="dropdown-divider my-0"></li>
+                                <li>
+                                    <a class="dropdown-item py-2" href="@(currentRole == "Student" ? Url.Action("Notifications", "Student") : "#")">
+                                        <div class="d-flex gap-2">
+                                            <i class="fa-solid fa-circle-check text-success mt-1"></i>
+                                            <div>
+                                                <div class="small fw-semibold">Smart Campus Active</div>
+                                                <div class="text-muted" style="font-size: 0.75rem;">Welcome to the portal. All services operational.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-0"></li>
+                                <li>
+                                    <a class="dropdown-item text-center py-2 text-primary small fw-semibold" href="@Url.Action("Notifications", "Student")">
+                                        View All Notifications
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- User Profile Dropdown -->
+                        <div class="dropdown">
+                            <button class="btn p-0 d-flex align-items-center gap-2 border-0 bg-transparent" type="button" data-bs-toggle="dropdown">
+                                <div class="user-avatar" style="width: 38px; height: 38px; font-size: 0.9rem;">
+                                    @(currentName.Length > 0 ? currentName.Substring(0, 1).ToUpper() : "U")
+                                </div>
+                                <div class="d-none d-md-block text-start">
+                                    <div class="fw-bold small text-dark" style="line-height: 1.2;">@currentName</div>
+                                    <div class="text-muted" style="font-size: 0.72rem;">@currentEmail</div>
+                                </div>
+                                <i class="fa-solid fa-chevron-down text-muted small ms-1"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li><h6 class="dropdown-header">Signed in as @currentRole</h6></li>
+                                <li><a class="dropdown-item" href="@Url.Action("Profile", "Account")"><i class="fa-solid fa-user me-2 text-muted"></i> Profile</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("ChangePassword", "Account")"><i class="fa-solid fa-key me-2 text-muted"></i> Change Password</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")"><i class="fa-solid fa-power-off me-2"></i> Log Out</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Page Content -->
+                <main class="app-content">
+                    @Html.Partial("_Alerts")
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Public Navigation Layout -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-3" style="background: #0f172a !important;">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center gap-2" href="@Url.Action("Index", "Home")">
+                    <div class="brand-icon" style="width: 36px; height: 36px; font-size: 1rem;">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <span class="fw-bolder fs-5 text-white">SmartCampus</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "Home" && currentAction == "Index" ? "active" : "")" href="@Url.Action("Index", "Home")">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "Home" && currentAction == "About" ? "active" : "")" href="@Url.Action("About", "Home")">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "Home" && currentAction == "Contact" ? "active" : "")" href="@Url.Action("Contact", "Home")">Contact & Directory</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="@Url.Action("Login", "Account")" class="btn btn-outline-light px-3 fw-semibold">
+                            <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Sign In
+                        </a>
+                        <a href="@Url.Action("Register", "Account")" class="btn btn-primary px-3 fw-semibold">
+                            <i class="fa-solid fa-user-plus me-1"></i> Student Register
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main>
+            @Html.Partial("_Alerts")
+            @RenderBody()
+        </main>
+
+        <footer class="bg-dark text-white py-5 mt-5" style="background: #090e17 !important;">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div class="brand-icon" style="width: 34px; height: 34px; font-size: 0.95rem;">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                            </div>
+                            <span class="fw-bold fs-5 text-white">SmartCampus</span>
+                        </div>
+                        <p class="text-secondary small">
+                            A unified next-generation enterprise campus management and service delivery platform integrating MVC Architecture, MongoDB database persistence, and robust REST APIs.
+                        </p>
+                    </div>
+                    <div class="col-lg-2 col-md-4">
+                        <h6 class="text-white fw-bold mb-3">Services</h6>
+                        <ul class="list-unstyled text-secondary small">
+                            <li class="mb-2">Library Services</li>
+                            <li class="mb-2">Hostel & Housing</li>
+                            <li class="mb-2">IT Support & WiFi</li>
+                            <li class="mb-2">Student Certificates</li>
+                            <li class="mb-2">Maintenance Desk</li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-4">
+                        <h6 class="text-white fw-bold mb-3">Portals</h6>
+                        <ul class="list-unstyled small">
+                            <li class="mb-2"><a href="@Url.Action("Login", "Account")" class="text-secondary">Student Dashboard</a></li>
+                            <li class="mb-2"><a href="@Url.Action("Login", "Account")" class="text-secondary">Faculty Dashboard</a></li>
+                            <li class="mb-2"><a href="@Url.Action("Login", "Account")" class="text-secondary">Admin Console</a></li>
+                            <li class="mb-2"><a href="@Url.Action("Register", "Account")" class="text-secondary">Register Account</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <h6 class="text-white fw-bold mb-3">Campus Office</h6>
+                        <p class="text-secondary small mb-1"><i class="fa-solid fa-location-dot me-2 text-primary"></i> 100 University Avenue, Tech Park Campus</p>
+                        <p class="text-secondary small mb-1"><i class="fa-solid fa-envelope me-2 text-primary"></i> helpdesk@campus.edu</p>
+                        <p class="text-secondary small mb-1"><i class="fa-solid fa-phone me-2 text-primary"></i> +1 (555) 019-2830 (24x7 Campus Helpline)</p>
+                    </div>
+                </div>
+                <hr class="border-secondary my-4 opacity-25">
+                <div class="d-flex flex-wrap justify-content-between align-items-center small text-secondary">
+                    <div>&copy; @DateTime.UtcNow.Year Smart Campus Service Portal. All rights reserved.</div>
+                    <div>Designed with ASP.NET MVC 5, MongoDB, Bootstrap 5 & REST APIs.</div>
+                </div>
+            </div>
+        </footer>
+    }
+
+    <!-- Scripts -->
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="~/Scripts/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sidebar Toggle for Mobile
+        $('#sidebarToggleBtn').on('click', function () {
+            $('#appSidebar').toggleClass('show');
+        });
+
+        // Global search filter handler
+        $('#globalSearchInput').on('keyup', function (e) {
+            if (e.key === 'Enter') {
+                var q = $(this).val();
+                if (q) {
+                    window.location.href = '@Url.Action("Services", "Student")?search=' + encodeURIComponent(q);
+                }
+            }
+        });
+
+        function markAllNotificationsRead() {
+            $('#notificationBadge').fadeOut();
+        }
+    </script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

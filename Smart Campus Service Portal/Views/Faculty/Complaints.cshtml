@@ -1,0 +1,106 @@
+@model List<Smart_Campus_Service_Portal.Models.Complaint>
+@{
+    ViewBag.Title = "Student Complaints & Grievances";
+    string selectedStatus = ViewBag.SelectedStatus as string ?? "All";
+    string searchTerm = ViewBag.SearchTerm as string;
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <h2>Department Student Complaints Desk</h2>
+        <p>Review student grievance reports, provide official faculty responses, and resolve tickets</p>
+    </div>
+</div>
+
+<!-- Complaints List -->
+<div class="card-panel">
+    <div class="card-panel-body p-0">
+        @if (Model != null && Model.Any())
+        {
+            <div class="list-group list-group-flush">
+                @foreach (var c in Model)
+                {
+                    string badgeClass = "badge-status-pending";
+                    if (c.Status == "Under Review" || c.Status == "In Progress") { badgeClass = "badge-status-inprogress"; }
+                    else if (c.Status == "Resolved" || c.Status == "Closed") { badgeClass = "badge-status-completed"; }
+
+                    <div class="list-group-item p-4 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="font-monospace fw-bold text-primary">@c.ComplaintNumber</span>
+                                <span class="badge bg-light text-dark border">@c.Category</span>
+                                <span class="badge bg-secondary">Priority: @c.Priority</span>
+                            </div>
+                            <span class="badge-status @badgeClass">@c.Status</span>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-1">@c.Subject</h5>
+                        <p class="text-secondary small mb-3">@c.Description</p>
+
+                        <div class="row g-2 mb-3 small text-muted">
+                            <div class="col-sm-4">
+                                <strong>Student:</strong> @c.StudentName (@c.StudentRollNo)
+                            </div>
+                            <div class="col-sm-4">
+                                <strong>Location:</strong> @c.Location
+                            </div>
+                            <div class="col-sm-4">
+                                <strong>Date:</strong> @c.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+                            </div>
+                        </div>
+
+                        <!-- Previous Responses -->
+                        @if (c.Responses != null && c.Responses.Any())
+                        {
+                            <div class="bg-light p-3 rounded border mb-3">
+                                <div class="small fw-bold text-secondary mb-2">Response History:</div>
+                                @foreach (var r in c.Responses)
+                                {
+                                    <div class="mb-2 pb-2 border-bottom last-border-0">
+                                        <div class="d-flex justify-content-between small">
+                                            <strong>@r.ResponderName (@r.Role)</strong>
+                                            <span class="text-muted">@r.Timestamp.ToString("MMM dd, HH:mm")</span>
+                                        </div>
+                                        <p class="mb-0 small text-dark">@r.Message</p>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <!-- Response Form -->
+                        <div class="mt-3 pt-3 border-top">
+                            @using (Html.BeginForm("RespondComplaint", "Faculty", FormMethod.Post, new { @class = "row g-2 align-items-center" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="complaintId" value="@c.Id" />
+                                <div class="col-md-7">
+                                    <input type="text" name="responseMessage" class="form-control form-control-sm" placeholder="Write official faculty response..." required />
+                                </div>
+                                <div class="col-md-3">
+                                    <select name="status" class="form-select form-select-sm">
+                                        <option value="In Progress" @(c.Status == "In Progress" ? "selected" : "")>Status: In Progress</option>
+                                        <option value="Resolved" @(c.Status == "Resolved" ? "selected" : "")>Status: Resolved</option>
+                                        <option value="Under Review" @(c.Status == "Under Review" ? "selected" : "")>Status: Under Review</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-sm btn-success w-100 fw-bold">
+                                        <i class="fa-solid fa-reply me-1"></i> Send
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fa-solid fa-check-double text-success display-4 mb-3"></i>
+                <h5 class="fw-bold">No complaints pending for your department</h5>
+                <p class="text-muted small">All student complaints have been addressed.</p>
+            </div>
+        }
+    </div>
+</div>

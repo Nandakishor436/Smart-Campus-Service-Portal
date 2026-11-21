@@ -1,0 +1,86 @@
+@model List<Smart_Campus_Service_Portal.Models.FacultyMember>
+@{
+    ViewBag.Title = "Faculty Directory";
+    var usersMap = ViewBag.UsersMap as Dictionary<string, Smart_Campus_Service_Portal.Models.User> ?? new Dictionary<string, Smart_Campus_Service_Portal.Models.User>();
+    var departments = ViewBag.Departments as List<string> ?? new List<string>();
+    string selectedDept = ViewBag.SelectedDepartment as string ?? "All";
+    string searchTerm = ViewBag.SearchTerm as string;
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <h2>Faculty & Department Staff Directory</h2>
+        <p>Campus academic educators, department chairs, and service officers</p>
+    </div>
+    <a href="@Url.Action("FacultyRegister", "Account")" class="btn btn-primary fw-bold shadow-sm">
+        <i class="fa-solid fa-user-plus me-1"></i> Register Faculty
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="card-panel mb-4">
+    <div class="card-panel-body py-3">
+        <form method="get" action="@Url.Action("Faculty", "Admin")" class="row g-3 align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by faculty ID, designation..." value="@searchTerm" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select name="department" class="form-select" onchange="this.form.submit()">
+                    <option value="All" @(selectedDept == "All" ? "selected" : "")>All Departments</option>
+                    @foreach (var d in departments)
+                    {
+                        <option value="@d" @(selectedDept == d ? "selected" : "")>@d</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Faculty Table -->
+<div class="card-panel">
+    <div class="card-panel-body p-0">
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Faculty ID</th>
+                        <th>Full Name & Email</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                        <th>Specialization</th>
+                        <th>Office Cabin</th>
+                        <th>Phone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var f in Model)
+                    {
+                        var user = usersMap.ContainsKey(f.UserId) ? usersMap[f.UserId] : null;
+
+                        <tr>
+                            <td>
+                                <span class="font-monospace fw-bold text-success">@f.FacultyId</span>
+                            </td>
+                            <td>
+                                <strong>@(user?.FullName ?? "Faculty Member")</strong>
+                                <small class="text-muted d-block">@(user?.Email ?? "N/A")</small>
+                            </td>
+                            <td>@f.Department</td>
+                            <td><span class="badge bg-light text-dark border">@f.Designation</span></td>
+                            <td class="small text-secondary">@(f.Specialization ?? "N/A")</td>
+                            <td class="small font-monospace">@(f.OfficeRoom ?? "N/A")</td>
+                            <td class="small text-muted">@(user?.Phone ?? "N/A")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

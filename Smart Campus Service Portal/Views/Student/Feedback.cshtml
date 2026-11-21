@@ -1,0 +1,117 @@
+@model Smart_Campus_Service_Portal.Models.ViewModels.FeedbackSubmitViewModel
+@{
+    ViewBag.Title = "Service Feedback & Ratings";
+    var feedbackList = ViewBag.FeedbackList as List<Smart_Campus_Service_Portal.Models.CampusFeedback> ?? new List<Smart_Campus_Service_Portal.Models.CampusFeedback>();
+    var services = ViewBag.Services as List<Smart_Campus_Service_Portal.Models.CampusService> ?? new List<Smart_Campus_Service_Portal.Models.CampusService>();
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <h2>Service Feedback & Ratings</h2>
+        <p>Share your experience with campus services to help us continuously improve quality</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Submit Feedback Card -->
+    <div class="col-lg-5">
+        <div class="card-panel">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-star text-warning"></i> Submit Feedback
+                </h5>
+            </div>
+            <div class="card-panel-body">
+                @using (Html.BeginForm("SubmitFeedback", "Student", FormMethod.Post, new { role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger small mb-3" })
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-secondary">Campus Service *</label>
+                        <select name="ServiceId" class="form-select" required>
+                            <option value="">-- Select Campus Service --</option>
+                            @foreach (var s in services)
+                            {
+                                <option value="@s.Id">@s.Name (@s.Category)</option>
+                            }
+                        </select>
+                        @Html.ValidationMessageFor(m => m.ServiceId, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-secondary">Overall Rating (1 - 5 Stars) *</label>
+                        <div class="d-flex gap-3 align-items-center">
+                            @for (int star = 5; star >= 1; star--)
+                            {
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="Rating" id="star_@star" value="@star" @(star == 5 ? "checked" : "")>
+                                    <label class="form-check-label fw-bold text-warning" for="star_@star">
+                                        @star <i class="fa-solid fa-star"></i>
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-secondary">Your Review & Suggestions *</label>
+                        @Html.TextAreaFor(m => m.Comments, new { @class = "form-control", rows = 4, placeholder = "What went well? How could the turnaround time or service quality be improved?", required = "required" })
+                        @Html.ValidationMessageFor(m => m.Comments, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+                        <i class="fa-solid fa-paper-plane me-2"></i> Submit Service Feedback
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Submitted Feedback List -->
+    <div class="col-lg-7">
+        <div class="card-panel">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-comments"></i> My Previous Feedback
+                </h5>
+            </div>
+            <div class="card-panel-body p-0">
+                @if (feedbackList.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var fb in feedbackList)
+                        {
+                            <div class="list-group-item p-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <h6 class="fw-bold mb-0 text-dark">@fb.ServiceName</h6>
+                                    <div class="text-warning small">
+                                        @for (int i = 0; i < fb.Rating; i++)
+                                        {
+                                            <i class="fa-solid fa-star"></i>
+                                        }
+                                        @for (int i = fb.Rating; i < 5; i++)
+                                        {
+                                            <i class="fa-regular fa-star text-muted"></i>
+                                        }
+                                    </div>
+                                </div>
+                                <span class="badge bg-light text-dark border mb-2">@fb.Category</span>
+                                <p class="text-secondary small mb-1">@fb.Comments</p>
+                                <small class="text-muted" style="font-size: 0.72rem;">Reviewed on @fb.CreatedAt.ToString("MMMM dd, yyyy")</small>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-star-half-stroke text-muted display-4 mb-3"></i>
+                        <h6 class="fw-bold">No feedback submitted yet</h6>
+                        <p class="text-muted small">Share your thoughts on services you have accessed recently.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

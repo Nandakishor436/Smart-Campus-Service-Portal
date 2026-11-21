@@ -1,0 +1,37 @@
+@model List<Smart_Campus_Service_Portal.Models.CampusService>
+@{
+    ViewBag.Title = "Department Campus Services";
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <h2>Department Campus Services</h2>
+        <p>Active university services managed or fulfilled by faculty and staff</p>
+    </div>
+</div>
+
+<div class="services-grid">
+    @foreach (var s in Model)
+    {
+        <div class="service-card">
+            <div>
+                <div class="service-card-icon">
+                    <i class="fa-solid @s.Icon"></i>
+                </div>
+                <div class="service-card-category">@s.Category</div>
+                <h4 class="service-card-title">@s.Name</h4>
+                <p class="service-card-desc">@s.Description</p>
+                <div class="small text-muted mb-2">
+                    <strong>Department:</strong> @s.Department
+                </div>
+            </div>
+
+            <div class="service-card-footer">
+                <span class="badge bg-success-subtle text-success">
+                    <i class="fa-solid fa-circle-check me-1"></i> Active
+                </span>
+                <span class="small text-muted fw-semibold">Turnaround: ~@s.EstimatedDays Days</span>
+            </div>
+        </div>
+    }
+</div>

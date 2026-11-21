@@ -1,0 +1,124 @@
+﻿@{
+    ViewBag.Title = "About Smart Campus Service Portal";
+}
+
+<section class="py-5 bg-light border-bottom">
+    <div class="container text-center py-4">
+        <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold text-uppercase mb-2">Campus Technology</span>
+        <h1 class="fw-bolder display-5">About Smart Campus Service Portal</h1>
+        <p class="lead text-muted max-w-2xl mx-auto">
+            A state-of-the-art enterprise educational service automation system built with robust MVC Architecture, MongoDB database persistence, and standardized REST APIs.
+        </p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <h3 class="fw-bolder mb-3">Project Overview & Objectives</h3>
+                <p class="text-secondary leading-relaxed">
+                    The Smart Campus Service Portal centralizes all student, faculty, and administrative service operations into a unified platform. Traditionally, campus requests (such as library carrel bookings, hostel room allocations, IT equipment maintenance, and bonafide certificate issuance) required manual physical forms and long waiting times.
+                </p>
+                <p class="text-secondary leading-relaxed">
+                    This platform modernizes the campus experience by delivering end-to-end digital request workflows, real-time status tracking timelines, transparent complaint resolution, dynamic feedback analytics, and printable confirmation vouchers.
+                </p>
+
+                <div class="row g-3 mt-4">
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-white rounded border">
+                            <i class="fa-solid fa-code text-primary fs-4 mb-2"></i>
+                            <h6 class="fw-bold mb-1">MVC Architecture</h6>
+                            <p class="text-muted small mb-0">Clean separation of Models, Views, and Controllers ensuring high maintainability and extensibility.</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-white rounded border">
+                            <i class="fa-solid fa-database text-success fs-4 mb-2"></i>
+                            <h6 class="fw-bold mb-1">MongoDB Persistence</h6>
+                            <p class="text-muted small mb-0">Flexible document storage with collections for Users, Services, Requests, Complaints, and Notices.</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-white rounded border">
+                            <i class="fa-solid fa-network-wired text-purple fs-4 mb-2" style="color: #9333ea;"></i>
+                            <h6 class="fw-bold mb-1">Standardized REST APIs</h6>
+                            <p class="text-muted small mb-0">Complete RESTful endpoints for integration with mobile apps, kiosks, and campus systems.</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-white rounded border">
+                            <i class="fa-solid fa-shield-halved text-danger fs-4 mb-2"></i>
+                            <h6 class="fw-bold mb-1">Enterprise Security</h6>
+                            <p class="text-muted small mb-0">BCrypt password hashing, session tokens, role-based authorization filters, and input validation.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 16px;">
+                    <h4 class="fw-bold mb-4">Supported Campus Services (8 Core Modules)</h4>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex align-items-center gap-3 px-0 py-3">
+                            <div class="stat-icon blue" style="width: 38px; height: 38px;"><i class="fa-solid fa-book-open"></i></div>
+                            <div>
+                                <strong class="d-block">1. Library Services</strong>
+                                <small class="text-muted">Book reservation, digital archive access, study carrels.</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center gap-3 px-0 py-3">
+                            <div class="stat-icon amber" style="width: 38px; height: 38px;"><i class="fa-solid fa-hotel"></i></div>
+                            <div>
+                                <strong class="d-block">2. Hostel Services</strong>
+                                <small class="text-muted">Room allocations, maintenance, outpass permissions.</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center gap-3 px-0 py-3">
+                            <div class="stat-icon green" style="width: 38px; height: 38px;"><i class="fa-solid fa-bus"></i></div>
+                            <div>
+                                <strong class="d-block">3. Transport Services</strong>
+                                <small class="text-muted">Campus bus passes, route alterations, parking stickers.</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center gap-3 px-0 py-3">
+                            <div class="stat-icon cyan" style="width: 38px; height: 38px;"><i class="fa-solid fa-laptop-code"></i></div>
+                            <div>
+                                <strong class="d-block">4. IT Support</strong>
+                                <small class="text-muted">Campus WiFi MAC registration, email resets, software licensing.</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center gap-3 px-0 py-3">
+                            <div class="stat-icon rose" style="width: 38px; height: 38px;"><i class="fa-solid fa-tools"></i></div>
+                            <div>
+                                <strong class="d-block">5. Maintenance Requests</strong>
+                                <small class="text-muted">Electrical, plumbing, air conditioning, and furniture repairs.</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center gap-3 px-0 py-3">
+                            <div class="stat-icon purple" style="width: 38px; height: 38px;"><i class="fa-solid fa-file-signature"></i></div>
+                            <div>
+                                <strong class="d-block">6. Student Certificates</strong>
+                                <small class="text-muted">Bonafide certificates, transcripts, fee structure receipts.</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center gap-3 px-0 py-3">
+                            <div class="stat-icon blue" style="width: 38px; height: 38px;"><i class="fa-solid fa-calendar-star"></i></div>
+                            <div>
+                                <strong class="d-block">7. Event Registration</strong>
+                                <small class="text-muted">Auditorium bookings, symposiums, sports facility permits.</small>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center gap-3 px-0 py-3">
+                            <div class="stat-icon green" style="width: 38px; height: 38px;"><i class="fa-solid fa-chalkboard-teacher"></i></div>
+                            <div>
+                                <strong class="d-block">8. Classroom & Laboratory Support</strong>
+                                <small class="text-muted">Projector AV setups, high-performance computing slots.</small>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

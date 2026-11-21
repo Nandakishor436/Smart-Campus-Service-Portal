@@ -1,0 +1,150 @@
+@{
+    Layout = null;
+    var req = ViewBag.Request as Smart_Campus_Service_Portal.Models.ServiceRequest;
+    var student = ViewBag.Student as Smart_Campus_Service_Portal.Models.Student;
+    var user = ViewBag.User as Smart_Campus_Service_Portal.Models.User;
+    var service = ViewBag.Service as Smart_Campus_Service_Portal.Models.CampusService;
+
+    if (req == null)
+    {
+        <!DOCTYPE html>
+        <html><body><div style="font-family: sans-serif; padding: 40px; text-align: center;"><h3>Voucher record not found.</h3><a href="/Student/MyRequests">Return to My Requests</a></div></body></html>
+        return;
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Official Service Voucher - @req.RequestNumber</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="~/Content/Site.css" rel="stylesheet" />
+</head>
+<body style="background: #e2e8f0; padding: 20px 0;">
+
+    <div class="container text-center mb-3 no-print">
+        <button onclick="window.print()" class="btn btn-primary btn-lg fw-bold px-4 shadow">
+            <i class="fa-solid fa-print me-2"></i> Print / Save as PDF
+        </button>
+        <button onclick="window.close()" class="btn btn-outline-secondary btn-lg fw-bold px-4 ms-2">
+            Close Window
+        </button>
+    </div>
+
+    <div class="voucher-container">
+        <!-- Voucher Header -->
+        <div class="voucher-header">
+            <div class="d-flex align-items-center gap-3">
+                <div class="brand-icon" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h3 class="fw-bolder mb-0 text-dark">SMART CAMPUS UNIVERSITY</h3>
+                    <small class="text-secondary fw-bold text-uppercase" style="letter-spacing: 0.08em;">Official Campus Service Acknowledgment Voucher</small>
+                </div>
+            </div>
+            <div class="voucher-seal">
+                OFFICIAL<br>CAMPUS<br>SEAL
+            </div>
+        </div>
+
+        <!-- Meta Information Grid -->
+        <div class="voucher-meta-grid">
+            <div>
+                <small class="text-secondary fw-bold text-uppercase d-block" style="font-size: 0.72rem;">Tracking Request Number</small>
+                <h4 class="font-monospace fw-bold text-primary mb-0">@req.RequestNumber</h4>
+            </div>
+            <div class="text-end">
+                <small class="text-secondary fw-bold text-uppercase d-block" style="font-size: 0.72rem;">Submission Timestamp</small>
+                <strong class="text-dark">@req.SubmissionDate.ToString("yyyy-MM-dd HH:mm:ss 'UTC'")</strong>
+            </div>
+            <div>
+                <small class="text-secondary fw-bold text-uppercase d-block" style="font-size: 0.72rem;">Service Category</small>
+                <strong class="text-dark">@(req.ServiceName ?? service?.Name ?? "Campus Service") (@(req.ServiceCategory ?? service?.Category ?? "General"))</strong>
+            </div>
+            <div class="text-end">
+                <small class="text-secondary fw-bold text-uppercase d-block" style="font-size: 0.72rem;">Current Status</small>
+                <span class="badge bg-dark px-3 py-1">@(req.Status?.ToUpper() ?? "PENDING")</span>
+            </div>
+        </div>
+
+        <!-- Student Information -->
+        <h6 class="fw-bold text-uppercase border-bottom pb-2 mb-3" style="font-size: 0.8rem; letter-spacing: 0.05em;">Student Identification</h6>
+        <table class="table table-sm table-bordered mb-4 small">
+            <tbody>
+                <tr>
+                    <th class="bg-light" style="width: 25%;">Student Full Name</th>
+                    <td><strong>@(req.StudentName ?? user?.FullName ?? "N/A")</strong></td>
+                    <th class="bg-light" style="width: 25%;">Roll Number / ID</th>
+                    <td><strong>@(req.StudentRollNo ?? student?.RollNumber ?? "N/A")</strong></td>
+                </tr>
+                <tr>
+                    <th class="bg-light">Academic Department</th>
+                    <td>@(req.Department ?? student?.Department ?? "General")</td>
+                    <th class="bg-light">Institutional Email</th>
+                    <td>@(req.StudentEmail ?? user?.Email ?? "N/A")</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Application Parameters -->
+        <h6 class="fw-bold text-uppercase border-bottom pb-2 mb-3" style="font-size: 0.8rem; letter-spacing: 0.05em;">Submitted Application Parameters</h6>
+        <table class="voucher-details-table">
+            <thead>
+                <tr class="bg-light">
+                    <th style="width: 40%;">Field / Requirement</th>
+                    <th>Submitted Information</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (req.FormDetails != null && req.FormDetails.Any())
+                {
+                    foreach (var field in req.FormDetails)
+                    {
+                        <tr>
+                            <td class="fw-bold text-secondary">@field.Key</td>
+                            <td>@field.Value</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="2" class="text-muted">Standard service application</td>
+                    </tr>
+                }
+                <tr>
+                    <td class="fw-bold text-secondary">Assigned Faculty / Administrator</td>
+                    <td>@(req.AssignedToName ?? "Central Campus Helpdesk Queue")</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold text-secondary">Administrative Remarks</td>
+                    <td>@(req.Remarks ?? "Application accepted for processing.")</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Signatures and Verification Block -->
+        <div class="voucher-signatures">
+            <div class="voucher-sig-box">
+                Applicant Signature<br>
+                <small class="text-muted">(@(req.StudentName ?? user?.FullName ?? "Student"))</small>
+            </div>
+            <div class="voucher-sig-box">
+                Authorized Faculty / Staff<br>
+                <small class="text-muted">(@(req.AssignedToName ?? "Department Head"))</small>
+            </div>
+            <div class="voucher-sig-box">
+                Registrar / Campus Director<br>
+                <small class="text-muted">Smart Campus Administration</small>
+            </div>
+        </div>
+
+        <div class="text-center mt-5 pt-3 border-top small text-muted">
+            This document is an electronically generated campus service acknowledgment slip from the Smart Campus Service Portal. Verification hash: <code>@(req.Id ?? req.RequestNumber)</code>.
+        </div>
+    </div>
+
+</body>
+</html>

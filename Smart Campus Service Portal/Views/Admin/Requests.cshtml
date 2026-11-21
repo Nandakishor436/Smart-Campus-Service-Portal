@@ -1,0 +1,214 @@
+@model List<Smart_Campus_Service_Portal.Models.ServiceRequest>
+@{
+    ViewBag.Title = "All Service Requests";
+    var categories = ViewBag.Categories as List<string> ?? new List<string>();
+    var facultyList = ViewBag.FacultyList as List<Smart_Campus_Service_Portal.Models.FacultyMember> ?? new List<Smart_Campus_Service_Portal.Models.FacultyMember>();
+    var facultyUsers = ViewBag.FacultyUsers as Dictionary<string, Smart_Campus_Service_Portal.Models.User> ?? new Dictionary<string, Smart_Campus_Service_Portal.Models.User>();
+    string selectedStatus = ViewBag.SelectedStatus as string ?? "All";
+    string selectedCategory = ViewBag.SelectedCategory as string ?? "All";
+    string searchTerm = ViewBag.SearchTerm as string;
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <h2>Campus Service Requests Directory</h2>
+        <p>Comprehensive oversight, faculty assignment, and lifecycle resolution for all submitted service requests</p>
+    </div>
+    <a href="@Url.Action("ExportRequestsCsv", "Admin")" class="btn btn-outline-primary fw-bold">
+        <i class="fa-solid fa-file-csv me-1"></i> Export to CSV
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="card-panel mb-4">
+    <div class="card-panel-body py-3">
+        <form method="get" action="@Url.Action("Requests", "Admin")" class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search request ID, student name, roll no..." value="@searchTerm" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select" onchange="this.form.submit()">
+                    <option value="All" @(selectedStatus == "All" ? "selected" : "")>All Statuses</option>
+                    <option value="Pending" @(selectedStatus == "Pending" ? "selected" : "")>Pending</option>
+                    <option value="In Progress" @(selectedStatus == "In Progress" ? "selected" : "")>In Progress</option>
+                    <option value="Approved" @(selectedStatus == "Approved" ? "selected" : "")>Approved</option>
+                    <option value="Completed" @(selectedStatus == "Completed" ? "selected" : "")>Completed</option>
+                    <option value="Rejected" @(selectedStatus == "Rejected" ? "selected" : "")>Rejected</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="category" class="form-select" onchange="this.form.submit()">
+                    <option value="All" @(selectedCategory == "All" ? "selected" : "")>All Categories</option>
+                    @foreach (var c in categories)
+                    {
+                        <option value="@c" @(selectedCategory == c ? "selected" : "")>@c</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Requests Table -->
+<div class="card-panel">
+    <div class="card-panel-body p-0">
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Tracking ID</th>
+                        <th>Student Information</th>
+                        <th>Service Category</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Assigned Officer</th>
+                        <th>Submission Date</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        string badgeClass = "badge-status-pending";
+                        if (r.Status == "In Progress") { badgeClass = "badge-status-inprogress"; }
+                        else if (r.Status == "Approved") { badgeClass = "badge-status-approved"; }
+                        else if (r.Status == "Completed") { badgeClass = "badge-status-completed"; }
+                        else if (r.Status == "Rejected") { badgeClass = "badge-status-rejected"; }
+
+                        <tr>
+                            <td>
+                                <span class="font-monospace fw-bold text-primary">@r.RequestNumber</span>
+                            </td>
+                            <td>
+                                <strong>@r.StudentName</strong>
+                                <small class="text-muted d-block font-monospace">@r.StudentRollNo &bull; @r.Department</small>
+                            </td>
+                            <td>
+                                <strong>@r.ServiceName</strong>
+                                <small class="text-muted d-block">@r.ServiceCategory</small>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">@r.Priority</span></td>
+                            <td><span class="badge-status @badgeClass">@r.Status</span></td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(r.AssignedToName))
+                                {
+                                    <span class="text-primary fw-semibold small">@r.AssignedToName</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small italic">Unassigned</span>
+                                }
+                            </td>
+                            <td class="text-muted small">@r.SubmissionDate.ToString("MMM dd, yyyy")</td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#actionModal_@r.Id" title="Update Status / Assign">
+                                        <i class="fa-solid fa-sliders"></i> Action
+                                    </button>
+                                    <a href="@Url.Action("Voucher", "Student", new { id = r.Id })" class="btn btn-outline-secondary" target="_blank" title="View Voucher Slip">
+                                        <i class="fa-solid fa-print"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Action Modal for each request -->
+                        <div class="modal fade" id="actionModal_@r.Id" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content text-start">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title fw-bold">Manage Request: @r.RequestNumber</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- Application Details -->
+                                        <div class="p-3 bg-light rounded border mb-4">
+                                            <div class="row g-2 small">
+                                                <div class="col-6"><strong>Student:</strong> @r.StudentName (@r.StudentRollNo)</div>
+                                                <div class="col-6"><strong>Department:</strong> @r.Department</div>
+                                                <div class="col-6"><strong>Service:</strong> @r.ServiceName (@r.ServiceCategory)</div>
+                                                <div class="col-6"><strong>Current Status:</strong> <span class="badge-status @badgeClass">@r.Status</span></div>
+                                            </div>
+                                            @if (r.FormDetails != null && r.FormDetails.Any())
+                                            {
+                                                <hr class="my-2">
+                                                <strong class="d-block small text-secondary mb-1">Form Input Details:</strong>
+                                                <ul class="mb-0 small ps-3">
+                                                    @foreach (var entry in r.FormDetails)
+                                                    {
+                                                        <li><strong>@entry.Key:</strong> @entry.Value</li>
+                                                    }
+                                                </ul>
+                                            }
+                                        </div>
+
+                                        <div class="row g-4">
+                                            <!-- Assign Faculty Form -->
+                                            <div class="col-md-6 border-end">
+                                                <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-user-tag text-primary me-1"></i> Assign Faculty / Staff</h6>
+                                                @using (Html.BeginForm("AssignRequest", "Admin", FormMethod.Post))
+                                                {
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="requestId" value="@r.Id" />
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-bold text-secondary">Select Faculty Member</label>
+                                                        <select name="facultyId" class="form-select form-select-sm" required>
+                                                            <option value="">-- Choose Faculty --</option>
+                                                            @foreach (var f in facultyList)
+                                                            {
+                                                                var fu = facultyUsers.ContainsKey(f.UserId) ? facultyUsers[f.UserId] : null;
+                                                                <option value="@f.UserId" @(r.AssignedToId == f.UserId ? "selected" : "")>
+                                                                    @(fu?.FullName ?? "Faculty") (@f.Department)
+                                                                </option>
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary fw-bold w-100">
+                                                        Assign to Faculty
+                                                    </button>
+                                                }
+                                            </div>
+
+                                            <!-- Update Status Form -->
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-arrows-rotate text-success me-1"></i> Update Status & Remarks</h6>
+                                                @using (Html.BeginForm("UpdateRequestStatus", "Admin", FormMethod.Post))
+                                                {
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="requestId" value="@r.Id" />
+                                                    <div class="mb-2">
+                                                        <label class="form-label small fw-bold text-secondary">New Status</label>
+                                                        <select name="status" class="form-select form-select-sm" required>
+                                                            <option value="Pending" @(r.Status == "Pending" ? "selected" : "")>Pending</option>
+                                                            <option value="In Progress" @(r.Status == "In Progress" ? "selected" : "")>In Progress</option>
+                                                            <option value="Approved" @(r.Status == "Approved" ? "selected" : "")>Approved</option>
+                                                            <option value="Completed" @(r.Status == "Completed" ? "selected" : "")>Completed</option>
+                                                            <option value="Rejected" @(r.Status == "Rejected" ? "selected" : "")>Rejected</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-bold text-secondary">Admin Remarks</label>
+                                                        <input type="text" name="remarks" class="form-control form-control-sm" placeholder="Reason / notes..." value="@r.Remarks" />
+                                                    </div>
+                                                    <button type="submit" class="btn btn-sm btn-success fw-bold w-100">
+                                                        Update Status
+                                                    </button>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

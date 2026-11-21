@@ -1,0 +1,147 @@
+@model Smart_Campus_Service_Portal.Models.ViewModels.ComplaintSubmitViewModel
+@{
+    ViewBag.Title = "Complaints & Grievances";
+    var complaints = ViewBag.Complaints as List<Smart_Campus_Service_Portal.Models.Complaint> ?? new List<Smart_Campus_Service_Portal.Models.Complaint>();
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <h2>Campus Complaints & Grievance Desk</h2>
+        <p>Report facility defects, academic concerns, hostel issues, or campus inquiries</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Submit Complaint Form -->
+    <div class="col-lg-5">
+        <div class="card-panel">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-triangle-exclamation text-warning"></i> Lodge a New Complaint
+                </h5>
+            </div>
+            <div class="card-panel-body">
+                @using (Html.BeginForm("SubmitComplaint", "Student", FormMethod.Post, new { role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger small mb-3" })
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-secondary">Complaint Category *</label>
+                        @Html.DropDownListFor(m => m.Category, new SelectList(new[] {
+                            "Hostel & Residential Life",
+                            "Campus Mess & Canteen",
+                            "Library & Study Halls",
+                            "IT, Network & WiFi",
+                            "Transport & Shuttles",
+                            "Classroom & Laboratory Facilities",
+                            "Estate & Maintenance",
+                            "Academic / Examination",
+                            "Other / General Campus"
+                        }), new { @class = "form-select", required = "required" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-secondary">Subject / Title *</label>
+                        @Html.TextBoxFor(m => m.Subject, new { @class = "form-control", placeholder = "Brief summary of the issue", required = "required" })
+                        @Html.ValidationMessageFor(m => m.Subject, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-secondary">Exact Campus Location *</label>
+                        @Html.TextBoxFor(m => m.Location, new { @class = "form-control", placeholder = "e.g. Block B, Room 302, Library 2nd Floor", required = "required" })
+                        @Html.ValidationMessageFor(m => m.Location, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-secondary">Priority Level *</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.Priority, "Low", new { @class = "form-check-input", id = "cpLow" })
+                                <label class="form-check-label small" for="cpLow">Low</label>
+                            </div>
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.Priority, "Medium", new { @class = "form-check-input", id = "cpMed", @checked = "checked" })
+                                <label class="form-check-label small" for="cpMed">Medium</label>
+                            </div>
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.Priority, "High", new { @class = "form-check-input", id = "cpHigh" })
+                                <label class="form-check-label small" for="cpHigh">High</label>
+                            </div>
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.Priority, "Urgent", new { @class = "form-check-input", id = "cpUrg" })
+                                <label class="form-check-label small text-danger fw-bold" for="cpUrg">Urgent</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-secondary">Detailed Description *</label>
+                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = 4, placeholder = "Explain what happened, frequency, and relevant context...", required = "required" })
+                        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <button type="submit" class="btn btn-warning text-dark w-100 py-2 fw-bold shadow-sm">
+                        <i class="fa-solid fa-paper-plane me-2"></i> Submit Complaint Ticket
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Complaint History List -->
+    <div class="col-lg-7">
+        <div class="card-panel">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-clock-rotate-left"></i> My Complaint History
+                </h5>
+            </div>
+            <div class="card-panel-body p-0">
+                @if (complaints.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var c in complaints)
+                        {
+                            string badgeClass = "badge-status-pending";
+                            if (c.Status == "Under Review" || c.Status == "In Progress") { badgeClass = "badge-status-inprogress"; }
+                            else if (c.Status == "Resolved" || c.Status == "Closed") { badgeClass = "badge-status-completed"; }
+
+                            <div class="list-group-item p-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="font-monospace fw-bold text-primary">@c.ComplaintNumber</span>
+                                        <span class="badge bg-light text-dark border">@c.Category</span>
+                                    </div>
+                                    <span class="badge-status @badgeClass">@c.Status</span>
+                                </div>
+
+                                <h6 class="fw-bold mb-1 text-dark">
+                                    <a href="@Url.Action("ComplaintDetails", "Student", new { id = c.Id })" class="text-dark text-decoration-none">
+                                        @c.Subject
+                                    </a>
+                                </h6>
+                                <p class="text-muted small mb-2">@c.Description</p>
+
+                                <div class="d-flex justify-content-between align-items-center small text-muted">
+                                    <span><i class="fa-solid fa-location-dot me-1"></i> @c.Location</span>
+                                    <a href="@Url.Action("ComplaintDetails", "Student", new { id = c.Id })" class="text-primary fw-bold">
+                                        View Thread &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-circle-check text-success display-4 mb-3"></i>
+                        <h6 class="fw-bold">No active complaints</h6>
+                        <p class="text-muted small">All systems clear. You haven't registered any complaints.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

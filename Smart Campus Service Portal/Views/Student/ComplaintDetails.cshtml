@@ -1,0 +1,116 @@
+@model Smart_Campus_Service_Portal.Models.Complaint
+@{
+    ViewBag.Title = $"Complaint {Model.ComplaintNumber}";
+
+    string badgeClass = "badge-status-pending";
+    if (Model.Status == "Under Review" || Model.Status == "In Progress") { badgeClass = "badge-status-inprogress"; }
+    else if (Model.Status == "Resolved" || Model.Status == "Closed") { badgeClass = "badge-status-completed"; }
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <a href="@Url.Action("Complaints", "Student")" class="small text-muted text-decoration-none mb-1 d-inline-block">
+            &larr; Back to Complaints
+        </a>
+        <div class="d-flex align-items-center gap-3">
+            <h2>@Model.ComplaintNumber</h2>
+            <span class="badge-status @badgeClass fs-6">@Model.Status</span>
+        </div>
+        <p>Lodge Date: @Model.CreatedAt.ToString("MMMM dd, yyyy HH:mm") &bull; Category: <strong>@Model.Category</strong></p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card-panel">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-file-circle-exclamation text-warning"></i> Complaint Information
+                </h5>
+            </div>
+            <div class="card-panel-body">
+                <h4 class="fw-bold mb-3">@Model.Subject</h4>
+                <div class="p-3 bg-light rounded border mb-4">
+                    <p class="mb-0 text-dark leading-relaxed">@Model.Description</p>
+                </div>
+
+                <div class="row g-3 mb-4 small">
+                    <div class="col-sm-4">
+                        <strong class="text-secondary d-block">Location:</strong>
+                        <span class="fw-semibold">@Model.Location</span>
+                    </div>
+                    <div class="col-sm-4">
+                        <strong class="text-secondary d-block">Priority:</strong>
+                        <span class="badge bg-secondary">@Model.Priority</span>
+                    </div>
+                    <div class="col-sm-4">
+                        <strong class="text-secondary d-block">Assigned Officer:</strong>
+                        <span class="fw-semibold text-primary">@(Model.AssignedToName ?? "Central Helpdesk Queue")</span>
+                    </div>
+                </div>
+
+                <!-- Responses Thread -->
+                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                    <i class="fa-solid fa-comments text-primary me-2"></i> Official Support & Resolution Thread
+                </h6>
+
+                @if (Model.Responses != null && Model.Responses.Any())
+                {
+                    <div class="d-flex flex-column gap-3 mb-4">
+                        @foreach (var resp in Model.Responses)
+                        {
+                            <div class="p-3 bg-light rounded border border-start-4 border-start-primary">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong class="text-primary">@resp.ResponderName <span class="badge bg-light text-dark border ms-1">@resp.Role</span></strong>
+                                    <small class="text-muted">@resp.Timestamp.ToString("MMM dd, yyyy HH:mm")</small>
+                                </div>
+                                <p class="mb-0 text-dark leading-relaxed">@resp.Message</p>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-light border small text-muted">
+                        <i class="fa-solid fa-clock me-1"></i> Awaiting official response from the assigned campus officer.
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.OfficialResponse) && (Model.Status == "Resolved" || Model.Status == "Closed"))
+                {
+                    <div class="alert alert-success border-success mt-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fa-solid fa-circle-check fs-5 text-success"></i>
+                            <strong class="text-success fs-6">Official Resolution Summary</strong>
+                        </div>
+                        <p class="mb-0 text-dark">@Model.OfficialResponse</p>
+                        @if (Model.ResolutionDate.HasValue)
+                        {
+                            <small class="text-muted d-block mt-2">Resolved on @Model.ResolutionDate.Value.ToString("MMMM dd, yyyy 'at' HH:mm")</small>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Help Card -->
+    <div class="col-lg-4">
+        <div class="card-panel">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-shield-heart text-danger"></i> Student Assistance
+                </h5>
+            </div>
+            <div class="card-panel-body">
+                <p class="small text-muted mb-3">
+                    If this is a physical emergency, medical concern, or urgent safety hazard, please contact the campus security room immediately.
+                </p>
+                <div class="p-3 bg-light rounded border text-center mb-3">
+                    <div class="small fw-bold text-uppercase text-danger mb-1">24x7 Campus Helpline</div>
+                    <h5 class="fw-bold mb-0 text-dark">+1 (555) 019-2830</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

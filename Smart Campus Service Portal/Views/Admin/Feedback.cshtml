@@ -1,0 +1,101 @@
+@model List<Smart_Campus_Service_Portal.Models.CampusFeedback>
+@{
+    ViewBag.Title = "Feedback Analytics";
+    double avgRating = ViewBag.AverageRating as double? ?? 5.0;
+    string searchTerm = ViewBag.SearchTerm as string;
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <h2>Student Feedback & Service Ratings</h2>
+        <p>Sentiment analysis, service satisfaction ratings, and student feedback records</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card text-center p-4">
+            <div class="display-4 fw-bolder text-primary mb-1">@avgRating</div>
+            <div class="text-warning fs-5 mb-2">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    if (i <= Math.Round(avgRating))
+                    {
+                        <i class="fa-solid fa-star"></i>
+                    }
+                    else
+                    {
+                        <i class="fa-regular fa-star text-muted"></i>
+                    }
+                }
+            </div>
+            <div class="fw-bold text-dark">Average Satisfaction Score</div>
+            <div class="text-muted small">Based on @Model.Count verified reviews</div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card-panel h-100">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-filter"></i> Search Feedback Records
+                </h5>
+            </div>
+            <div class="card-panel-body">
+                <form method="get" action="@Url.Action("Feedback", "Admin")" class="row g-2">
+                    <div class="col-md-9">
+                        <input type="text" name="search" class="form-control" placeholder="Search by service name or feedback keywords..." value="@searchTerm" />
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Table / Feed -->
+<div class="card-panel">
+    <div class="card-panel-body p-0">
+        @if (Model != null && Model.Any())
+        {
+            <div class="list-group list-group-flush">
+                @foreach (var fb in Model)
+                {
+                    <div class="list-group-item p-4 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h5 class="fw-bold mb-0 text-dark">@fb.ServiceName</h5>
+                                <span class="badge bg-light text-dark border">@fb.Category</span>
+                            </div>
+                            <div class="text-warning fs-6">
+                                @for (int i = 0; i < fb.Rating; i++)
+                                {
+                                    <i class="fa-solid fa-star"></i>
+                                }
+                                @for (int i = fb.Rating; i < 5; i++)
+                                {
+                                    <i class="fa-regular fa-star text-muted"></i>
+                                }
+                            </div>
+                        </div>
+
+                        <p class="text-secondary small mb-2 leading-relaxed">@fb.Comments</p>
+
+                        <div class="small text-muted">
+                            Submitted by <strong>@fb.StudentName</strong> &bull; @fb.CreatedAt.ToString("MMMM dd, yyyy HH:mm")
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fa-solid fa-star-half-stroke text-muted display-4 mb-3"></i>
+                <h5 class="fw-bold">No feedback records found</h5>
+            </div>
+        }
+    </div>
+</div>

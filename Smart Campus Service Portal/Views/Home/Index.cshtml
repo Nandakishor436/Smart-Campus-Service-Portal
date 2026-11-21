@@ -1,0 +1,281 @@
+﻿@using Smart_Campus_Service_Portal.Models
+@{
+    ViewBag.Title = "Welcome to Smart Campus Service Portal";
+    var services = ViewBag.Services as List<CampusService> ?? new List<CampusService>();
+    var announcements = ViewBag.Announcements as List<Announcement> ?? new List<Announcement>();
+}
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <div class="hero-badge">
+                    <i class="fa-solid fa-sparkles text-warning"></i> Campus Service Portal v2.0
+                </div>
+                <h1 class="hero-title">
+                    Unified <span>Smart Campus</span> Digital Service Portal
+                </h1>
+                <p class="hero-lead">
+                    Seamless digital gateway for Students, Faculty, and Administrators. Request academic certificates, report campus issues, reserve lab equipment, and access 8+ campus services with real-time tracking.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="@Url.Action("Login", "Account")" class="btn btn-primary btn-lg px-4 py-3 fw-bold shadow-sm">
+                        <i class="fa-solid fa-right-to-bracket me-2"></i> Access Portal Sign In
+                    </a>
+                    <a href="@Url.Action("Register", "Account")" class="btn btn-outline-light btn-lg px-4 py-3 fw-bold">
+                        <i class="fa-solid fa-user-plus me-2"></i> Student Registration
+                    </a>
+                    <a href="#servicesSection" class="btn btn-link text-white-50 px-3 py-3 fw-semibold text-decoration-none">
+                        Explore Services <i class="fa-solid fa-arrow-down ms-1"></i>
+                    </a>
+                </div>
+
+                <!-- Live Campus Counter -->
+                <div class="hero-stats-row">
+                    <div class="row text-center g-3">
+                        <div class="col-3 border-end border-secondary border-opacity-25">
+                            <h3 class="text-white fw-bold mb-0">@(ViewBag.TotalStudents ?? 0)+</h3>
+                            <small class="text-secondary fw-semibold">Students</small>
+                        </div>
+                        <div class="col-3 border-end border-secondary border-opacity-25">
+                            <h3 class="text-white fw-bold mb-0">@(ViewBag.TotalFaculty ?? 0)+</h3>
+                            <small class="text-secondary fw-semibold">Faculty</small>
+                        </div>
+                        <div class="col-3 border-end border-secondary border-opacity-25">
+                            <h3 class="text-white fw-bold mb-0">@(ViewBag.TotalServices ?? 8)</h3>
+                            <small class="text-secondary fw-semibold">Services</small>
+                        </div>
+                        <div class="col-3">
+                            <h3 class="text-success fw-bold mb-0">@(ViewBag.CompletedRequests ?? 0)+</h3>
+                            <small class="text-secondary fw-semibold">Fulfilled</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <!-- Demo Login Fast Access Card -->
+                <div class="card border-0 shadow-lg" style="background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(12px); border-radius: 20px;">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <div class="stat-icon blue" style="width: 44px; height: 44px;">
+                                <i class="fa-solid fa-key"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0 text-dark">One-Click Demo Access</h5>
+                                <small class="text-muted">Instant role-based test credentials</small>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-3">
+                            <!-- Student Quick Login -->
+                            <form action="@Url.Action("Login", "Account")" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="Email" value="student.alex@campus.edu" />
+                                <input type="hidden" name="Password" value="Student@123" />
+                                <button type="submit" class="btn btn-outline-primary w-100 py-2 text-start d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-solid fa-user-graduate text-primary"></i>
+                                        <div>
+                                            <strong class="d-block text-dark">Student Demo (Alex)</strong>
+                                            <small class="text-muted">student.alex@campus.edu</small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-primary">Login &rarr;</span>
+                                </button>
+                            </form>
+
+                            <!-- Faculty Quick Login -->
+                            <form action="@Url.Action("Login", "Account")" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="Email" value="faculty.sharma@campus.edu" />
+                                <input type="hidden" name="Password" value="Faculty@123" />
+                                <button type="submit" class="btn btn-outline-success w-100 py-2 text-start d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-solid fa-chalkboard-user text-success"></i>
+                                        <div>
+                                            <strong class="d-block text-dark">Faculty Demo (Prof. Sharma)</strong>
+                                            <small class="text-muted">faculty.sharma@campus.edu</small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-success">Login &rarr;</span>
+                                </button>
+                            </form>
+
+                            <!-- Admin Quick Login -->
+                            <form action="@Url.Action("Login", "Account")" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="Email" value="admin@campus.edu" />
+                                <input type="hidden" name="Password" value="Admin@123" />
+                                <button type="submit" class="btn btn-outline-danger w-100 py-2 text-start d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-solid fa-shield-halved text-danger"></i>
+                                        <div>
+                                            <strong class="d-block text-dark">Admin Demo (Director)</strong>
+                                            <small class="text-muted">admin@campus.edu</small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-danger">Login &rarr;</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <hr class="my-4">
+                        <div class="text-center small text-muted">
+                            Need an account? <a href="@Url.Action("Register", "Account")" class="fw-bold">Sign up as Student</a> or <a href="@Url.Action("Login", "Account")" class="fw-bold">Sign in with credentials</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Announcements Ticker Section -->
+@if (announcements.Any())
+{
+    <section class="py-4 bg-white border-bottom shadow-sm">
+        <div class="container">
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-danger px-3 py-2 fw-bold text-uppercase">
+                    <i class="fa-solid fa-bullhorn me-1"></i> Campus Notices
+                </span>
+                <div class="flex-grow-1 overflow-hidden" style="white-space: nowrap; text-overflow: ellipsis;">
+                    @foreach (var notice in announcements.Take(2))
+                    {
+                        <span class="me-4 text-dark fw-semibold small">
+                            <span class="badge bg-light text-dark border me-1">@notice.Category</span>
+                            @notice.Title &mdash; <span class="text-muted">@notice.CreatedAt.ToString("MMM dd, yyyy")</span>
+                        </span>
+                    }
+                </div>
+                <a href="@Url.Action("Login", "Account")" class="small fw-bold text-primary text-nowrap">View All &rarr;</a>
+            </div>
+        </div>
+    </section>
+}
+
+<!-- Campus Services Showcase Section -->
+<section class="py-5" id="servicesSection">
+    <div class="container py-4">
+        <div class="text-center max-w-xl mx-auto mb-5">
+            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold text-uppercase mb-2">Campus Service Catalog</span>
+            <h2 class="fw-bolder display-6">Comprehensive Campus Services</h2>
+            <p class="text-muted">
+                Digitized workflow for all student and faculty campus requirements with instant status updates, assigned handlers, and printable vouchers.
+            </p>
+        </div>
+
+        <div class="services-grid">
+            @foreach (var s in services)
+            {
+                <div class="service-card">
+                    <div>
+                        <div class="service-card-icon">
+                            <i class="fa-solid @s.Icon"></i>
+                        </div>
+                        <div class="service-card-category">@s.Category</div>
+                        <h4 class="service-card-title">@s.Name</h4>
+                        <p class="service-card-desc">@s.Description</p>
+                    </div>
+
+                    <div class="service-card-footer">
+                        <small class="text-muted fw-semibold">
+                            <i class="fa-regular fa-clock me-1"></i> ~@s.EstimatedDays Days SLA
+                        </small>
+                        <a href="@Url.Action("Login", "Account")" class="btn btn-sm btn-outline-primary fw-bold">
+                            Apply Online <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Role Breakdown Features -->
+<section class="py-5 bg-white border-top border-bottom">
+    <div class="container py-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold text-uppercase mb-2">Role-Based Architecture</span>
+                <h2 class="fw-bolder mb-4">Tailored Dashboards for Every Campus Stakeholder</h2>
+                <div class="d-flex gap-3 mb-4">
+                    <div class="stat-icon blue flex-shrink-0" style="width: 40px; height: 40px; font-size: 1.1rem;">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">Student Portal</h5>
+                        <p class="text-muted small mb-0">Browse services, submit requests, track progress with real-time timelines, download official vouchers, lodge complaints, and view notices.</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-3 mb-4">
+                    <div class="stat-icon green flex-shrink-0" style="width: 40px; height: 40px; font-size: 1.1rem;">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">Faculty Portal</h5>
+                        <p class="text-muted small mb-0">Review assigned requests, update request lifecycle (Approve, Reject, In Progress, Completed), respond to complaints, and monitor feedback.</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-3">
+                    <div class="stat-icon rose flex-shrink-0" style="width: 40px; height: 40px; font-size: 1.1rem;">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">Administrator Console</h5>
+                        <p class="text-muted small mb-0">Manage services CRUD, user directories, complaints resolution, publish announcements, and view visual analytics charts with exportable CSV reports.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card shadow-lg border-0 bg-dark text-white p-4" style="border-radius: 20px;">
+                    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom border-secondary border-opacity-25 pb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary">REST API</span>
+                            <span class="text-secondary small font-monospace">/api/requests/REQ-2026-0001</span>
+                        </div>
+                        <span class="badge bg-success">200 OK</span>
+                    </div>
+                    <pre class="mb-0 text-info font-monospace small" style="overflow-x: auto;">
+{
+  "success": true,
+  "message": "Service request retrieved",
+  "data": {
+    "requestNumber": "REQ-2026-0001",
+    "serviceName": "Student Certificates",
+    "status": "Completed",
+    "student": "Alex Johnson (CS-2024-042)",
+    "timeline": [
+      { "status": "Pending", "by": "Student" },
+      { "status": "Approved", "by": "Prof. Rajesh Sharma" },
+      { "status": "Completed", "by": "Campus Admin" }
+    ]
+  }
+}
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 text-center bg-primary text-white" style="background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;">
+    <div class="container py-4">
+        <h2 class="fw-bolder display-6 mb-3">Ready to Experience Modern Campus Services?</h2>
+        <p class="lead mb-4 text-white-50 max-w-xl mx-auto">
+            Log in to your respective portal to manage campus services or create your student profile today.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="@Url.Action("Login", "Account")" class="btn btn-light btn-lg px-4 py-3 fw-bold text-primary shadow">
+                Sign In to Portal
+            </a>
+            <a href="@Url.Action("Register", "Account")" class="btn btn-outline-light btn-lg px-4 py-3 fw-bold">
+                Student Registration
+            </a>
+        </div>
+    </div>
+</section>

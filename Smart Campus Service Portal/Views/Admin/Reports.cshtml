@@ -1,0 +1,125 @@
+@model Smart_Campus_Service_Portal.Models.ViewModels.ReportsFilterViewModel
+@{
+    ViewBag.Title = "Reports & Analytics";
+    var categories = ViewBag.Categories as List<string> ?? new List<string>();
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <h2>Campus Service Reports & Analytics</h2>
+        <p>Generate audit summaries, analyze category bottlenecks, and export institutional service logs</p>
+    </div>
+    <a href="@Url.Action("ExportRequestsCsv", "Admin")" class="btn btn-primary fw-bold shadow-sm">
+        <i class="fa-solid fa-file-csv me-1"></i> Export Filtered CSV
+    </a>
+</div>
+
+<!-- Filter Criteria -->
+<div class="card-panel mb-4">
+    <div class="card-panel-header">
+        <h5 class="card-panel-title">
+            <i class="fa-solid fa-filter text-primary"></i> Filter Audit Parameters
+        </h5>
+    </div>
+    <div class="card-panel-body">
+        @using (Html.BeginForm("Reports", "Admin", FormMethod.Get, new { @class = "row g-3" }))
+        {
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-secondary">Start Date</label>
+                <input type="date" name="StartDate" class="form-control" value="@(Model.StartDate.HasValue ? Model.StartDate.Value.ToString("yyyy-MM-dd") : "")" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-secondary">End Date</label>
+                <input type="date" name="EndDate" class="form-control" value="@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString("yyyy-MM-dd") : "")" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-secondary">Service Category</label>
+                <select name="ServiceCategory" class="form-select">
+                    <option value="All">All Categories</option>
+                    @foreach (var c in categories)
+                    {
+                        <option value="@c" @(Model.ServiceCategory == c ? "selected" : "")>@c</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-secondary">Status</label>
+                <select name="Status" class="form-select">
+                    <option value="All">All Statuses</option>
+                    <option value="Pending" @(Model.Status == "Pending" ? "selected" : "")>Pending</option>
+                    <option value="In Progress" @(Model.Status == "In Progress" ? "selected" : "")>In Progress</option>
+                    <option value="Approved" @(Model.Status == "Approved" ? "selected" : "")>Approved</option>
+                    <option value="Completed" @(Model.Status == "Completed" ? "selected" : "")>Completed</option>
+                    <option value="Rejected" @(Model.Status == "Rejected" ? "selected" : "")>Rejected</option>
+                </select>
+            </div>
+            <div class="col-12 d-flex justify-content-end gap-2 pt-2">
+                <a href="@Url.Action("Reports", "Admin")" class="btn btn-outline-secondary btn-sm fw-semibold">Reset Filters</a>
+                <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm">Generate Report</button>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Report Summary Metrics -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-title">Matching Requests</div>
+            <h3 class="stat-value text-primary">@Model.FilteredRequests.Count</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-title">Fulfilled / Completed</div>
+            <h3 class="stat-value text-success">@Model.FilteredRequests.Count(r => r.Status == "Completed")</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-title">Campus Complaints Logged</div>
+            <h3 class="stat-value text-warning">@Model.FilteredComplaints.Count</h3>
+        </div>
+    </div>
+</div>
+
+<!-- Filtered Requests Table -->
+<div class="card-panel">
+    <div class="card-panel-header">
+        <h5 class="card-panel-title">
+            <i class="fa-solid fa-table-list"></i> Filtered Service Request Logs (@Model.FilteredRequests.Count)
+        </h5>
+    </div>
+    <div class="card-panel-body p-0">
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Tracking ID</th>
+                        <th>Student Name & Roll No</th>
+                        <th>Service Category</th>
+                        <th>Status</th>
+                        <th>Assigned Officer</th>
+                        <th>Submission Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.FilteredRequests)
+                    {
+                        <tr>
+                            <td class="font-monospace fw-bold text-primary">@r.RequestNumber</td>
+                            <td>
+                                <strong>@r.StudentName</strong>
+                                <small class="text-muted d-block font-monospace">@r.StudentRollNo</small>
+                            </td>
+                            <td>@r.ServiceName (@r.ServiceCategory)</td>
+                            <td><span class="badge bg-light text-dark border">@r.Status</span></td>
+                            <td>@(r.AssignedToName ?? "Unassigned")</td>
+                            <td class="text-muted small">@r.SubmissionDate.ToString("yyyy-MM-dd HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

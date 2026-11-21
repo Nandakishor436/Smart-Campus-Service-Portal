@@ -1,0 +1,113 @@
+@model Smart_Campus_Service_Portal.Models.ViewModels.FacultyRegisterViewModel
+@{
+    ViewBag.Title = "Faculty Registration";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg p-4 p-md-5" style="border-radius: 20px; background: #ffffff;">
+                <div class="text-center mb-4">
+                    <div class="brand-icon mx-auto mb-3" style="width: 54px; height: 54px; font-size: 1.4rem; background: linear-gradient(135deg, #10b981, #047857);">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                    </div>
+                    <h3 class="fw-bolder mb-1 text-dark">Faculty & Staff Registration</h3>
+                    <p class="text-muted small">Register faculty member credentials to manage academic service requests and student inquiries</p>
+                </div>
+
+                @using (Html.BeginForm("FacultyRegister", "Account", FormMethod.Post, new { role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger small mb-3" })
+
+                    <h6 class="fw-bold text-success mb-3"><i class="fa-solid fa-user-tie me-2"></i> Faculty Profile</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Full Name with Title *</label>
+                            @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "e.g. Prof. Rajesh Sharma", required = "required" })
+                            @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Faculty Institutional Email *</label>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "sharma@campus.edu", required = "required" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Username *</label>
+                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control", placeholder = "faculty.sharma", required = "required" })
+                            @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Contact Phone</label>
+                            @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = "+1 555-014-9922" })
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-success mb-3"><i class="fa-solid fa-briefcase me-2"></i> Departmental Designation</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-secondary">Faculty Employee ID *</label>
+                            @Html.TextBoxFor(m => m.FacultyId, new { @class = "form-control", placeholder = "e.g. FAC-CS-102", required = "required" })
+                            @Html.ValidationMessageFor(m => m.FacultyId, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-secondary">Department *</label>
+                            @Html.DropDownListFor(m => m.Department, new SelectList(new[] {
+                                "Computer Science",
+                                "Electrical Engineering",
+                                "Mechanical Engineering",
+                                "Civil Engineering",
+                                "Information Technology",
+                                "Library & Information Science",
+                                "Student Housing & Residential Life",
+                                "Campus Operations & Transport",
+                                "Dean of Student Affairs"
+                            }), new { @class = "form-select", required = "required" })
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-secondary">Designation *</label>
+                            @Html.DropDownListFor(m => m.Designation, new SelectList(new[] {
+                                "Department Chair / HOD",
+                                "Professor",
+                                "Associate Professor",
+                                "Assistant Professor",
+                                "Lab In-Charge",
+                                "Academic Coordinator"
+                            }), new { @class = "form-select", required = "required" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Research Specialization</label>
+                            @Html.TextBoxFor(m => m.Specialization, new { @class = "form-control", placeholder = "e.g. Artificial Intelligence & Algorithms" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Office Room / Cabin</label>
+                            @Html.TextBoxFor(m => m.OfficeRoom, new { @class = "form-control", placeholder = "e.g. Tech Block, Room 304" })
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-success mb-3"><i class="fa-solid fa-lock me-2"></i> Account Security</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Password *</label>
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "At least 6 characters", required = "required" })
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Confirm Password *</label>
+                            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Re-type password", required = "required" })
+                            @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger small" })
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold shadow-sm mb-3">
+                        <i class="fa-solid fa-user-plus me-2"></i> Register Faculty Account
+                    </button>
+
+                    <div class="text-center small text-muted">
+                        Already have an account? <a href="@Url.Action("Login", "Account")" class="fw-bold text-success">Sign In here</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

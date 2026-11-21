@@ -1,0 +1,106 @@
+@model Smart_Campus_Service_Portal.Models.ViewModels.RegisterViewModel
+@{
+    ViewBag.Title = "Student Registration";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg p-4 p-md-5" style="border-radius: 20px; background: #ffffff;">
+                <div class="text-center mb-4">
+                    <div class="brand-icon mx-auto mb-3" style="width: 54px; height: 54px; font-size: 1.4rem;">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <h3 class="fw-bolder mb-1 text-dark">Student Registration</h3>
+                    <p class="text-muted small">Create your student service portal account to access campus services</p>
+                </div>
+
+                @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger small mb-3" })
+
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-id-card me-2"></i> Personal Details</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Full Name *</label>
+                            @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "e.g. Alex Johnson", required = "required" })
+                            @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Campus Email Address *</label>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "alex@campus.edu", required = "required" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Username *</label>
+                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control", placeholder = "alex.johnson", required = "required" })
+                            @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Contact Phone Number</label>
+                            @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = "+1 555-012-3456" })
+                            @Html.ValidationMessageFor(m => m.Phone, "", new { @class = "text-danger small" })
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-graduation-cap me-2"></i> Academic Information</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-secondary">Roll Number / Student ID *</label>
+                            @Html.TextBoxFor(m => m.RollNumber, new { @class = "form-control", placeholder = "e.g. CS-2024-042", required = "required" })
+                            @Html.ValidationMessageFor(m => m.RollNumber, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-secondary">Department *</label>
+                            @Html.DropDownListFor(m => m.Department, new SelectList(new[] {
+                                "Computer Science",
+                                "Electrical Engineering",
+                                "Mechanical Engineering",
+                                "Civil Engineering",
+                                "Information Technology",
+                                "Management Studies",
+                                "Biotechnology",
+                                "Physics & Chemistry"
+                            }), new { @class = "form-select", required = "required" })
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-secondary">Current Semester *</label>
+                            @Html.DropDownListFor(m => m.Semester, new SelectList(new[] { 1, 2, 3, 4, 5, 6, 7, 8 }), new { @class = "form-select", required = "required" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Degree Program *</label>
+                            @Html.TextBoxFor(m => m.Degree, new { @class = "form-control", placeholder = "e.g. B.Tech Computer Science" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Campus Hostel / Residential Address</label>
+                            @Html.TextBoxFor(m => m.Address, new { @class = "form-control", placeholder = "e.g. Room 214, Pine Valley Hostel" })
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-lock me-2"></i> Account Security</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Password *</label>
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "At least 6 characters", required = "required" })
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Confirm Password *</label>
+                            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Re-type password", required = "required" })
+                            @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger small" })
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow-sm mb-3">
+                        <i class="fa-solid fa-user-check me-2"></i> Complete Student Registration
+                    </button>
+
+                    <div class="text-center small text-muted">
+                        Already have an account? <a href="@Url.Action("Login", "Account")" class="fw-bold text-primary">Sign In here</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

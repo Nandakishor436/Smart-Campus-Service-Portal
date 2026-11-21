@@ -1,0 +1,85 @@
+@model List<Smart_Campus_Service_Portal.Models.Student>
+@{
+    ViewBag.Title = "Student Directory";
+    var usersMap = ViewBag.UsersMap as Dictionary<string, Smart_Campus_Service_Portal.Models.User> ?? new Dictionary<string, Smart_Campus_Service_Portal.Models.User>();
+    var departments = ViewBag.Departments as List<string> ?? new List<string>();
+    string selectedDept = ViewBag.SelectedDepartment as string ?? "All";
+    string searchTerm = ViewBag.SearchTerm as string;
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <h2>Student Academic Directory</h2>
+        <p>Comprehensive roster of all registered students, enrollment details, and academic departments</p>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="card-panel mb-4">
+    <div class="card-panel-body py-3">
+        <form method="get" action="@Url.Action("Students", "Admin")" class="row g-3 align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by roll number, degree..." value="@searchTerm" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select name="department" class="form-select" onchange="this.form.submit()">
+                    <option value="All" @(selectedDept == "All" ? "selected" : "")>All Departments</option>
+                    @foreach (var d in departments)
+                    {
+                        <option value="@d" @(selectedDept == d ? "selected" : "")>@d</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Students Table -->
+<div class="card-panel">
+    <div class="card-panel-body p-0">
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Roll Number</th>
+                        <th>Student Name</th>
+                        <th>Department</th>
+                        <th>Degree & Program</th>
+                        <th>Semester</th>
+                        <th>Academic Year</th>
+                        <th>Residential Address</th>
+                        <th>Registered Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in Model)
+                    {
+                        var user = usersMap.ContainsKey(s.UserId) ? usersMap[s.UserId] : null;
+
+                        <tr>
+                            <td>
+                                <span class="font-monospace fw-bold text-primary">@s.RollNumber</span>
+                            </td>
+                            <td>
+                                <strong>@(user?.FullName ?? "Student")</strong>
+                                <small class="text-muted d-block">@(user?.Email ?? "N/A")</small>
+                            </td>
+                            <td>@s.Department</td>
+                            <td>@s.Degree</td>
+                            <td><span class="badge bg-light text-dark border">Sem @s.Semester</span></td>
+                            <td>@s.AcademicYear</td>
+                            <td class="small text-muted">@(s.Address ?? "N/A")</td>
+                            <td class="text-muted small">@s.CreatedAt.ToString("MMM dd, yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,251 @@
+@model Smart_Campus_Service_Portal.Models.ViewModels.FacultyDashboardViewModel
+@{
+    ViewBag.Title = "Faculty Dashboard";
+}
+
+<!-- Welcome Banner -->
+<div class="card-panel border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%); color: #ffffff;">
+    <div class="card-panel-body p-4 p-md-5">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="badge bg-success px-3 py-1 mb-2 fw-bold text-uppercase">Faculty Portal</span>
+                <h2 class="fw-bolder mb-1 text-white">Welcome, @(Model.User?.FullName ?? "Faculty Member")!</h2>
+                <p class="text-white-50 mb-3">
+                    ID: <strong class="text-white">@(Model.Faculty?.FacultyId ?? "FAC-001")</strong> &bull;
+                    Department: <strong class="text-white">@(Model.Faculty?.Department ?? "Academic")</strong> &bull;
+                    Designation: <strong class="text-white">@(Model.Faculty?.Designation ?? "Professor")</strong> &bull;
+                    Cabin: <strong class="text-white">@(Model.Faculty?.OfficeRoom ?? "Room 304")</strong>
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="@Url.Action("AssignedRequests", "Faculty")" class="btn btn-success btn-sm fw-bold px-3">
+                        <i class="fa-solid fa-list-check me-1"></i> Review Requests Queue
+                    </a>
+                    <a href="@Url.Action("Complaints", "Faculty")" class="btn btn-outline-light btn-sm fw-bold px-3">
+                        <i class="fa-solid fa-comment-dots me-1"></i> Resolve Complaints
+                    </a>
+                    <a href="@Url.Action("Feedback", "Faculty")" class="btn btn-outline-light btn-sm fw-bold px-3">
+                        <i class="fa-solid fa-star me-1"></i> Student Feedback
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0 d-none d-lg-block">
+                <div class="brand-icon mx-auto me-lg-0" style="width: 80px; height: 80px; font-size: 2.5rem; background: rgba(16, 185, 129, 0.2); border: 2px solid rgba(16, 185, 129, 0.4);">
+                    <i class="fa-solid fa-chalkboard-user text-success"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card">
+            <div class="stat-icon blue mb-2" style="width: 40px; height: 40px; font-size: 1.1rem;"><i class="fa-solid fa-inbox"></i></div>
+            <div class="stat-title">Total Assigned</div>
+            <h3 class="stat-value">@Model.TotalAssignedRequests</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card">
+            <div class="stat-icon amber mb-2" style="width: 40px; height: 40px; font-size: 1.1rem;"><i class="fa-solid fa-clock"></i></div>
+            <div class="stat-title">Pending Review</div>
+            <h3 class="stat-value text-warning">@Model.PendingApprovalRequests</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card">
+            <div class="stat-icon cyan mb-2" style="width: 40px; height: 40px; font-size: 1.1rem;"><i class="fa-solid fa-spinner"></i></div>
+            <div class="stat-title">In Progress</div>
+            <h3 class="stat-value text-info">@Model.InProgressRequests</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card">
+            <div class="stat-icon green mb-2" style="width: 40px; height: 40px; font-size: 1.1rem;"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="stat-title">Completed</div>
+            <h3 class="stat-value text-success">@Model.CompletedRequests</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card">
+            <div class="stat-icon rose mb-2" style="width: 40px; height: 40px; font-size: 1.1rem;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="stat-title">Open Complaints</div>
+            <h3 class="stat-value text-danger">@Model.AssignedComplaints</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card">
+            <div class="stat-icon purple mb-2" style="width: 40px; height: 40px; font-size: 1.1rem;"><i class="fa-solid fa-check-double"></i></div>
+            <div class="stat-title">Resolved</div>
+            <h3 class="stat-value">@Model.ResolvedComplaints</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Assigned Requests Queue -->
+    <div class="col-lg-8">
+        <div class="card-panel">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-list-check text-primary"></i> Service Requests Awaiting Review
+                </h5>
+                <a href="@Url.Action("AssignedRequests", "Faculty")" class="btn btn-sm btn-outline-primary fw-bold">View All</a>
+            </div>
+            <div class="card-panel-body p-0">
+                @if (Model.AssignedRequests.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Tracking ID</th>
+                                    <th>Student</th>
+                                    <th>Service</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var r in Model.AssignedRequests)
+                                {
+                                    string badgeClass = "badge-status-pending";
+                                    if (r.Status == "In Progress") { badgeClass = "badge-status-inprogress"; }
+                                    else if (r.Status == "Approved") { badgeClass = "badge-status-approved"; }
+                                    else if (r.Status == "Completed") { badgeClass = "badge-status-completed"; }
+                                    else if (r.Status == "Rejected") { badgeClass = "badge-status-rejected"; }
+
+                                    <tr>
+                                        <td>
+                                            <a href="@Url.Action("RequestDetails", "Faculty", new { id = r.Id })" class="fw-bold text-primary font-monospace">
+                                                @r.RequestNumber
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <strong>@r.StudentName</strong>
+                                            <small class="text-muted d-block font-monospace">@r.StudentRollNo</small>
+                                        </td>
+                                        <td>@r.ServiceName</td>
+                                        <td><span class="badge bg-light text-dark border">@r.Priority</span></td>
+                                        <td><span class="badge-status @badgeClass">@r.Status</span></td>
+                                        <td class="text-end">
+                                            <a href="@Url.Action("RequestDetails", "Faculty", new { id = r.Id })" class="btn btn-sm btn-primary fw-bold">
+                                                Review &rarr;
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-inbox text-muted display-4 mb-3"></i>
+                        <h6 class="fw-bold">No assigned requests in queue</h6>
+                        <p class="text-muted small">All requests assigned to you or your department have been handled.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Complaints Assigned -->
+        <div class="card-panel">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-triangle-exclamation text-warning"></i> Department Complaints & Grievances
+                </h5>
+                <a href="@Url.Action("Complaints", "Faculty")" class="btn btn-sm btn-outline-warning text-dark fw-bold">Manage</a>
+            </div>
+            <div class="card-panel-body p-0">
+                @if (Model.AssignedComplaintsList.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var c in Model.AssignedComplaintsList)
+                        {
+                            <div class="list-group-item p-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="font-monospace fw-bold text-primary">@c.ComplaintNumber</span>
+                                    <span class="badge bg-light text-dark border">@c.Status</span>
+                                </div>
+                                <h6 class="fw-bold mb-1 text-dark">@c.Subject</h6>
+                                <p class="text-muted small mb-2">@c.Description</p>
+                                <div class="d-flex justify-content-between align-items-center small text-muted">
+                                    <span>From: <strong>@c.StudentName</strong> (@c.StudentRollNo)</span>
+                                    <a href="@Url.Action("ComplaintDetails", "Faculty", new { id = c.Id })" class="btn btn-sm btn-outline-secondary">Respond</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4">
+                        <i class="fa-solid fa-circle-check text-success fs-3 mb-2"></i>
+                        <p class="text-muted small mb-0">No open student complaints for your department.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Announcements & Department Feedback -->
+    <div class="col-lg-4">
+        <!-- Faculty Announcements -->
+        <div class="card-panel">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-bullhorn text-primary"></i> Faculty Notices
+                </h5>
+            </div>
+            <div class="card-panel-body p-0">
+                <div class="list-group list-group-flush">
+                    @foreach (var a in Model.Announcements)
+                    {
+                        <div class="list-group-item p-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-light text-dark border">@a.Category</span>
+                                <small class="text-muted" style="font-size: 0.72rem;">@a.CreatedAt.ToString("MMM dd")</small>
+                            </div>
+                            <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.9rem;">@a.Title</h6>
+                            <p class="text-muted small mb-0" style="font-size: 0.8rem;">@(a.Content.Length > 90 ? a.Content.Substring(0, 90) + "..." : a.Content)</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Feedback -->
+        <div class="card-panel">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-star text-warning"></i> Recent Student Reviews
+                </h5>
+                <a href="@Url.Action("Feedback", "Faculty")" class="btn btn-sm btn-link text-primary p-0">All reviews</a>
+            </div>
+            <div class="card-panel-body p-0">
+                <div class="list-group list-group-flush">
+                    @foreach (var fb in Model.RecentFeedback)
+                    {
+                        <div class="list-group-item p-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <strong class="small text-dark">@fb.ServiceName</strong>
+                                <span class="text-warning small">
+                                    @for (int i = 0; i < fb.Rating; i++)
+                                    {
+                                        <i class="fa-solid fa-star"></i>
+                                    }
+                                </span>
+                            </div>
+                            <p class="text-muted small mb-1" style="font-size: 0.8rem;">@fb.Comments</p>
+                            <small class="text-muted" style="font-size: 0.7rem;">By @fb.StudentName on @fb.CreatedAt.ToString("MMM dd")</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

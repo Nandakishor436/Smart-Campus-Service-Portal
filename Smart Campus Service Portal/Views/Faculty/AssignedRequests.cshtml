@@ -1,0 +1,108 @@
+@model List<Smart_Campus_Service_Portal.Models.ServiceRequest>
+@{
+    ViewBag.Title = "Assigned Service Requests";
+    string selectedStatus = ViewBag.SelectedStatus as string ?? "All";
+    string searchTerm = ViewBag.SearchTerm as string;
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <h2>Department Service Requests Queue</h2>
+        <p>Review, approve, reject, and update requests assigned to you or your department</p>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card-panel mb-4">
+    <div class="card-panel-body py-3">
+        <form method="get" action="@Url.Action("AssignedRequests", "Faculty")" class="row g-3 align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by student name, roll number, or ID..." value="@searchTerm" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select name="status" class="form-select" onchange="this.form.submit()">
+                    <option value="All" @(selectedStatus == "All" ? "selected" : "")>All Statuses</option>
+                    <option value="Pending" @(selectedStatus == "Pending" ? "selected" : "")>Pending Review</option>
+                    <option value="In Progress" @(selectedStatus == "In Progress" ? "selected" : "")>In Progress</option>
+                    <option value="Approved" @(selectedStatus == "Approved" ? "selected" : "")>Approved</option>
+                    <option value="Completed" @(selectedStatus == "Completed" ? "selected" : "")>Completed</option>
+                    <option value="Rejected" @(selectedStatus == "Rejected" ? "selected" : "")>Rejected</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Requests Table -->
+<div class="card-panel">
+    <div class="card-panel-body p-0">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Tracking ID</th>
+                            <th>Student Information</th>
+                            <th>Department</th>
+                            <th>Service Category</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Submission Date</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model)
+                        {
+                            string badgeClass = "badge-status-pending";
+                            if (r.Status == "In Progress") { badgeClass = "badge-status-inprogress"; }
+                            else if (r.Status == "Approved") { badgeClass = "badge-status-approved"; }
+                            else if (r.Status == "Completed") { badgeClass = "badge-status-completed"; }
+                            else if (r.Status == "Rejected") { badgeClass = "badge-status-rejected"; }
+
+                            <tr>
+                                <td>
+                                    <a href="@Url.Action("RequestDetails", "Faculty", new { id = r.Id })" class="fw-bold text-primary font-monospace">
+                                        @r.RequestNumber
+                                    </a>
+                                </td>
+                                <td>
+                                    <strong>@r.StudentName</strong>
+                                    <small class="text-muted d-block font-monospace">@r.StudentRollNo</small>
+                                </td>
+                                <td>@r.Department</td>
+                                <td>
+                                    <strong>@r.ServiceName</strong>
+                                    <small class="text-muted d-block">@r.ServiceCategory</small>
+                                </td>
+                                <td><span class="badge bg-light text-dark border">@r.Priority</span></td>
+                                <td><span class="badge-status @badgeClass">@r.Status</span></td>
+                                <td class="text-muted small">@r.SubmissionDate.ToString("MMM dd, yyyy HH:mm")</td>
+                                <td class="text-end">
+                                    <a href="@Url.Action("RequestDetails", "Faculty", new { id = r.Id })" class="btn btn-sm btn-primary fw-bold">
+                                        <i class="fa-solid fa-pen-to-square me-1"></i> Review
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fa-solid fa-folder-open text-muted display-4 mb-3"></i>
+                <h5 class="fw-bold">No requests found</h5>
+                <p class="text-muted small">No requests match the selected status filter.</p>
+            </div>
+        }
+    </div>
+</div>

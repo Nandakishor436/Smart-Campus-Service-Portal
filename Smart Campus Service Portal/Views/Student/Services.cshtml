@@ -1,0 +1,82 @@
+@model List<Smart_Campus_Service_Portal.Models.CampusService>
+@{
+    ViewBag.Title = "Campus Services Catalog";
+    var categories = ViewBag.Categories as List<string> ?? new List<string>();
+    string selectedCategory = ViewBag.SelectedCategory as string ?? "All";
+    string searchTerm = ViewBag.SearchTerm as string;
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <h2>Campus Services Catalog</h2>
+        <p>Browse available academic, housing, technical, and administrative services</p>
+    </div>
+</div>
+
+<!-- Search & Category Filters -->
+<div class="card-panel mb-4">
+    <div class="card-panel-body py-3">
+        <form method="get" action="@Url.Action("Services", "Student")" class="row g-3 align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by service name or description..." value="@searchTerm" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select name="category" class="form-select" onchange="this.form.submit()">
+                    <option value="All" @(selectedCategory == "All" ? "selected" : "")>All Categories</option>
+                    @foreach (var cat in categories)
+                    {
+                        <option value="@cat" @(selectedCategory == cat ? "selected" : "")>@cat</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Services Grid -->
+@if (Model != null && Model.Any())
+{
+    <div class="services-grid">
+        @foreach (var s in Model)
+        {
+            <div class="service-card">
+                <div>
+                    <div class="service-card-icon">
+                        <i class="fa-solid @s.Icon"></i>
+                    </div>
+                    <div class="service-card-category">@s.Category</div>
+                    <h4 class="service-card-title">@s.Name</h4>
+                    <p class="service-card-desc">@s.Description</p>
+                    
+                    <div class="mb-3 small text-secondary">
+                        <div><i class="fa-solid fa-building me-1 text-muted"></i> @s.Department</div>
+                    </div>
+                </div>
+
+                <div class="service-card-footer">
+                    <small class="text-muted fw-semibold">
+                        <i class="fa-regular fa-clock me-1"></i> ~@s.EstimatedDays Days SLA
+                    </small>
+                    <a href="@Url.Action("ApplyService", "Student", new { id = s.Id })" class="btn btn-primary btn-sm fw-bold px-3">
+                        Apply Now <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="card-panel text-center py-5">
+        <i class="fa-solid fa-folder-open text-muted display-4 mb-3"></i>
+        <h5 class="fw-bold">No services found matching your criteria</h5>
+        <p class="text-muted small">Try adjusting your search terms or select "All Categories".</p>
+        <a href="@Url.Action("Services", "Student")" class="btn btn-outline-primary btn-sm fw-bold">Clear Filters</a>
+    </div>
+}

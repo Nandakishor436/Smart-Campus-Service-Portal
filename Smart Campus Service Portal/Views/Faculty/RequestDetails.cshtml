@@ -1,0 +1,154 @@
+@model Smart_Campus_Service_Portal.Models.ViewModels.ServiceRequestDetailViewModel
+@{
+    var r = Model.Request;
+    ViewBag.Title = $"Faculty Review - {r.RequestNumber}";
+
+    string badgeClass = "badge-status-pending";
+    if (r.Status == "In Progress") { badgeClass = "badge-status-inprogress"; }
+    else if (r.Status == "Approved") { badgeClass = "badge-status-approved"; }
+    else if (r.Status == "Completed") { badgeClass = "badge-status-completed"; }
+    else if (r.Status == "Rejected") { badgeClass = "badge-status-rejected"; }
+}
+
+<div class="page-header">
+    <div class="page-title">
+        <a href="@Url.Action("AssignedRequests", "Faculty")" class="small text-muted text-decoration-none mb-1 d-inline-block">
+            &larr; Back to Assigned Queue
+        </a>
+        <div class="d-flex align-items-center gap-3">
+            <h2>@r.RequestNumber &mdash; Faculty Review</h2>
+            <span class="badge-status @badgeClass fs-6">@r.Status</span>
+        </div>
+        <p>Applicant: <strong>@r.StudentName</strong> (@r.StudentRollNo) &bull; Service: <strong>@r.ServiceName</strong></p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Details & Update Form -->
+    <div class="col-lg-7">
+        <!-- Faculty Action Panel -->
+        <div class="card-panel border-primary">
+            <div class="card-panel-header bg-light">
+                <h5 class="card-panel-title text-primary">
+                    <i class="fa-solid fa-gavel"></i> Take Action on Request
+                </h5>
+            </div>
+            <div class="card-panel-body">
+                @using (Html.BeginForm("UpdateRequestStatus", "Faculty", FormMethod.Post, new { role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="requestId" value="@r.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-secondary">Update Request Status *</label>
+                        <select name="status" class="form-select form-select-lg fw-bold" required>
+                            <option value="In Progress" @(r.Status == "In Progress" ? "selected" : "")>Set: In Progress (Processing / Verification)</option>
+                            <option value="Approved" @(r.Status == "Approved" ? "selected" : "")>Set: Approved (Faculty Approval Granted)</option>
+                            <option value="Completed" @(r.Status == "Completed" ? "selected" : "")>Set: Completed (Service Delivered / Ready)</option>
+                            <option value="Rejected" @(r.Status == "Rejected" ? "selected" : "")>Set: Rejected (Not Eligible / Denied)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-secondary">Faculty Comments / Notes *</label>
+                        <textarea name="comment" class="form-control" rows="3" placeholder="Provide reason for approval/rejection or instructions for the student..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary px-4 py-2 fw-bold shadow-sm">
+                        <i class="fa-solid fa-floppy-disk me-2"></i> Update Request Status & Notify Student
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- Student Application Form Details -->
+        <div class="card-panel">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-clipboard-check"></i> Application Form Data
+                </h5>
+            </div>
+            <div class="card-panel-body">
+                <table class="table table-bordered small mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="bg-light" style="width: 35%;">Student Name</th>
+                            <td><strong>@r.StudentName</strong></td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Roll Number</th>
+                            <td><span class="font-monospace fw-bold">@r.StudentRollNo</span></td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Department</th>
+                            <td>@r.Department</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Institutional Email</th>
+                            <td>@r.StudentEmail</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Service Name</th>
+                            <td>@r.ServiceName (@r.ServiceCategory)</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Submission Timestamp</th>
+                            <td>@r.SubmissionDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        </tr>
+
+                        @if (r.FormDetails != null && r.FormDetails.Any())
+                        {
+                            foreach (var field in r.FormDetails)
+                            {
+                                <tr>
+                                    <th class="bg-light text-primary">@field.Key</th>
+                                    <td class="text-dark fw-semibold">@field.Value</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Status History Timeline -->
+    <div class="col-lg-5">
+        <div class="card-panel">
+            <div class="card-panel-header">
+                <h5 class="card-panel-title">
+                    <i class="fa-solid fa-route text-success"></i> Audit History Timeline
+                </h5>
+            </div>
+            <div class="card-panel-body">
+                <div class="tracking-timeline">
+                    @if (r.StatusHistory != null && r.StatusHistory.Any())
+                    {
+                        for (int i = 0; i < r.StatusHistory.Count; i++)
+                        {
+                            var item = r.StatusHistory[i];
+                            bool isLast = (i == r.StatusHistory.Count - 1);
+                            string stepClass = isLast ? "active" : "completed";
+
+                            <div class="timeline-step @stepClass">
+                                <div class="timeline-step-icon">
+                                    <i class="fa-solid @(isLast ? "fa-circle-dot" : "fa-check")"></i>
+                                </div>
+                                <div class="timeline-step-content">
+                                    <div class="timeline-step-header">
+                                        <h6 class="timeline-step-title">@item.Status</h6>
+                                        <span class="timeline-step-time">@item.Timestamp.ToString("MMM dd, HH:mm")</span>
+                                    </div>
+                                    <div class="small text-muted mb-1">
+                                        Action by <strong>@item.ChangedBy</strong> (@item.Role)
+                                    </div>
+                                    <p class="timeline-step-note">@item.Comment</p>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
